@@ -1,31 +1,34 @@
 <!DOCTYPE html>
-<html lang="kk">
+<html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: #1a1a1a; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; }
-        button { 
-            padding: 15px 30px; font-size: 18px; font-weight: bold;
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
-            color: white; border: none; border-radius: 10px; cursor: pointer;
+        body { background: #0e0e0e; color: white; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+        .btn { 
+            background: linear-gradient(45deg, #ff0000, #990000); 
+            color: white; border: none; padding: 20px 40px; 
+            font-size: 20px; font-weight: bold; border-radius: 15px; 
+            cursor: pointer; box-shadow: 0 5px 15px rgba(255,0,0,0.4);
         }
     </style>
 </head>
 <body>
-    <h2>FREE FIRE БЕТА ТУТОР</h2>
-    <p>Жарнаманы бастау үшін төмендегі батырманы басыңыз</p>
-    <button id="mainBtn">НАЧАТЬ 🚀</button>
+    <h1>FREE FIRE BETA</h1>
+    <p>Жарнаманы іске қосу үшін төмендегі батырманы басыңыз:</p>
+    <br>
+    <button class="btn" onclick="start()">НАЧАТЬ 🚀</button>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); 
 
-        document.getElementById("mainBtn").addEventListener("click", () => {
-            // Ботқа сигнал жіберу
+        function start() {
+            // Bot Business-ке сигнал жіберу
             tg.sendData("start_spam");
-            tg.close();
-        });
+            tg.close(); // Терезені жабу
+        }
     </script>
 </body>
 </html>
