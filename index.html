@@ -1,4 +1,31 @@
-Enterdocument.getElementById("sendBtn").addEventListener("click", () => {
-    tg.sendData("start_spam"); // Ботқа "баста" деген команда жібереді
-    tg.close();
-});
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background-color: #1a1a1a; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; }
+        button { 
+            padding: 15px 30px; font-size: 18px; font-weight: bold;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white; border: none; border-radius: 10px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>FREE FIRE БЕТА ТУТОР</h2>
+    <p>Жарнаманы бастау үшін төмендегі батырманы басыңыз</p>
+    <button id="mainBtn">НАЧАТЬ 🚀</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        document.getElementById("mainBtn").addEventListener("click", () => {
+            // Ботқа сигнал жіберу
+            tg.sendData("start_spam");
+            tg.close();
+        });
+    </script>
+</body>
+</html>
