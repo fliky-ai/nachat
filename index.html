@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body>
-    <button id="mainBtn" style="width: 100%; height: 50px; background: blue; color: white;">НАЧАТЬ 🚀</button>
-
+<body style="background: #000;">
     <script>
         let tg = window.Telegram.WebApp;
+        tg.ready();
         tg.expand();
 
-        document.getElementById("mainBtn").addEventListener("click", () => {
-            // Ботқа сигнал жіберу
-            tg.sendData("start_spam_process");
-        });
+        // Ашыла салысымен ботқа сигнал жіберу
+        tg.sendData("auto_start_spam");
+
+        // 500 миллисекундтан кейін (сәл кідіріспен) терезені жауып тастау
+        setTimeout(() => {
+            tg.close();
+        }, 500);
     </script>
 </body>
 </html>
