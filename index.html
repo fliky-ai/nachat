@@ -1,22 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="kk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qazaq Voice AI</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1c1c1c; color: white; text-align: center; padding: 20px; }
+        textarea { width: 90%; height: 150px; border-radius: 10px; padding: 10px; margin-top: 20px; }
+        button { background: #0088cc; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; margin-top: 20px; cursor: pointer; }
+        .status { margin-top: 10px; font-size: 14px; color: #aaa; }
+    </style>
 </head>
-<body style="background: #000;">
+<body>
+    <h1>Qazaq AI Voice 🎙️</h1>
+    <p>Мәтінді жазыңыз, мен оны қазақша оқимын</p>
+
+    <textarea id="textInput" placeholder="Осы жерге мәтін жаз..."></textarea>
+    <br>
+    <button onclick="speakText()">Дауыстау 🔊</button>
+    <div id="status" class="status"></div>
+
     <script>
+        // Telegram WebApp баптаулары
         let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        tg.expand(); // Экранды толық ашу
 
-        // Ашыла салысымен ботқа сигнал жіберу
-        tg.sendData("auto_start_spam");
+        function speakText() {
+            const text = document.getElementById('textInput').value;
+            const status = document.getElementById('status');
 
-        // 500 миллисекундтан кейін (сәл кідіріспен) терезені жауып тастау
-        setTimeout(() => {
-            tg.close();
-        }, 500);
+            if (!text) {
+                alert("Мәтін бос!");
+                return;
+            }
+
+            // Браузердің дауыстау функциясы (SpeechSynthesis)
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Қазақша дауысты іздеу
+            const voices = synth.getVoices();
+            const kzVoice = voices.find(v => v.lang.includes('kk') || v.lang.includes('kz'));
+
+            if (kzVoice) {
+                utterance.voice = kzVoice;
+            } else {
+                status.innerText = "Ескерту: Құрылғыңызда қазақша дауыс табылмады, стандартты дауыс қолданылады.";
+            }
+
+            utterance.rate = 1.0; // Жылдамдығы
+            utterance.pitch = 1.0; // Дауыс биіктігі
+
+            status.innerText = "Оқып жатырмын...";
+            synth.speak(utterance);
+
+            utterance.onend = () => {
+                status.innerText = "Аяқталды!";
+            };
+        }
     </script>
 </body>
 </html>
