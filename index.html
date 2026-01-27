@@ -3,45 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qazaq Voice AI - Free</title>
+    <title>Qazaq Voice AI - Stable</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: white; text-align: center; padding: 20px; }
         .card { max-width: 450px; margin: auto; background: #1e1e1e; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
         h2 { color: #0088cc; margin-bottom: 20px; }
         textarea { width: 100%; height: 150px; border-radius: 15px; border: none; padding: 15px; box-sizing: border-box; background: #2d2d2d; color: white; font-size: 16px; margin-bottom: 15px; outline: none; border: 1px solid #444; }
-        textarea:focus { border-color: #0088cc; }
-        .controls { display: flex; gap: 10px; margin-bottom: 15px; }
-        select { flex: 1; padding: 10px; border-radius: 10px; background: #2d2d2d; color: white; border: 1px solid #444; outline: none; }
         button { width: 100%; background: linear-gradient(45deg, #0088cc, #00c6ff); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
         button:active { transform: scale(0.95); }
-        .audio-player { display: none; background: #2d2d2d; padding: 20px; border-radius: 15px; animation: slideUp 0.5s ease; }
-        audio { width: 100%; height: 40px; }
+        .audio-player { display: none; background: #2d2d2d; padding: 20px; border-radius: 15px; animation: fadeIn 0.5s; }
+        audio { width: 100%; }
         .download-btn { display: inline-block; margin-top: 15px; background: #28a745; color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; width: 85%; }
         #status { margin-bottom: 10px; font-size: 14px; color: #aaa; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Qazaq AI Voice 🎙️</h2>
-    <div id="status">Мәтінді жазып, батырманы басыңыз</div>
+    <h2>Qazaq Voice AI 🎙️</h2>
+    <div id="status">Мәтін жазыңыз (Тегін және Тұрақты)</div>
     
-    <textarea id="textInput" placeholder="TikTok-қа арналған мәтінді осы жерге жазыңыз..."></textarea>
+    <textarea id="textInput" placeholder="Сәлем, қалайсың?"></textarea>
     
-    <div class="controls">
-        <select id="voiceSelect">
-            <option value="kk-KZ-MadiNeural">Мади (Ер адам)</option>
-            <option value="kk-KZ-AigulNeural">Айгүл (Әйел адам)</option>
-        </select>
-    </div>
-
     <button onclick="generateVoice()">Дауысқа айналдыру 🔊</button>
 
     <div id="audioSection" class="audio-player">
         <audio id="audioPlayer" controls></audio>
-        <a id="downloadLink" class="download-btn" href="#" download="qazaq_voice.mp3">MP3 Жүктеу 📥</a>
+        <a id="downloadLink" class="download-btn" href="#" download="voicover.mp3">MP3 Жүктеу 📥</a>
     </div>
 </div>
 
@@ -50,35 +40,38 @@
     tg.expand();
 
     function generateVoice() {
-        const text = document.getElementById('textInput').value;
-        const voice = document.getElementById('voiceSelect').value;
+        const text = document.getElementById('textInput').value.trim();
         const status = document.getElementById('status');
         const audioSection = document.getElementById('audioSection');
         const audioPlayer = document.getElementById('audioPlayer');
         const downloadLink = document.getElementById('downloadLink');
 
-        if (!text.trim()) {
-            alert("Мәтін бос! Бірдеңе жазыңыз.");
+        if (!text) {
+            alert("Мәтін жазыңыз!");
             return;
         }
 
         status.innerText = "Дайындап жатырмын... ⏳";
         audioSection.style.display = 'none';
 
-        // Microsoft Edge-дің тегін API сілтемесі (Proxy арқылы)
-        const apiUrl = `https://api.v9.ee/tts?text=${encodeURIComponent(text)}&voice=${voice}`;
+        // Google Translate TTS API - ең сенімді жол
+        const apiUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=kk&client=tw-ob`;
 
-        // Тікелей плеерге сілтеме береміз
         audioPlayer.src = apiUrl;
         downloadLink.href = apiUrl;
 
-        audioPlayer.oncanplaythrough = () => {
+        // Аудио жүктелгенде
+        audioPlayer.onloadeddata = () => {
             status.innerText = "Дайын! Төменде тыңдап, жүктеп алыңыз 👇";
             audioSection.style.display = 'block';
         };
 
+        // Қате болған жағдайда балама сілтеме (басқа сервер арқылы)
         audioPlayer.onerror = () => {
-            status.innerText = "Қате шықты! Басқа мәтін көріңіз немесе қайта байқаңыз.";
+            const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=kk`;
+            audioPlayer.src = fallbackUrl;
+            downloadLink.href = fallbackUrl;
+            status.innerText = "Қайта көріңіз...";
         };
     }
 </script>
