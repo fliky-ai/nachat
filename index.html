@@ -3,60 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daugram - Next Gen Messenger</title>
+    <title>Daugram - Premium Messenger</title>
     <style>
         :root {
             --primary: #0088cc;
+            --primary-dark: #005588;
             --bg: #f0f2f5;
-            --glass: rgba(255, 255, 255, 0.8);
-            --shadow: 0 8px 32px rgba(0,0,0,0.1);
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
 
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); overflow: hidden; height: 100vh; color: #333; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; background: var(--bg); overflow: hidden; height: 100vh; color: #333; }
 
         /* --- AUTH SCREEN --- */
-        .auth-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0088cc 0%, #005588 100%); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: white; width: 100%; max-width: 380px; padding: 30px; border-radius: 24px; box-shadow: var(--shadow); text-align: center; display: none; transform: translateY(20px); transition: 0.5s; }
-        .auth-card.active { display: block; transform: translateY(0); }
-        .logo-box { font-size: 48px; margin-bottom: 10px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,136,204,0.1); }
-        .btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .auth-screen { 
+            position: fixed; inset: 0; 
+            background: radial-gradient(circle at top right, #00aaff, #005588); 
+            z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; 
+        }
+        .auth-card { 
+            background: white; width: 100%; max-width: 360px; padding: 40px 30px; 
+            border-radius: 28px; box-shadow: var(--shadow); text-align: center; 
+            display: none; position: relative; z-index: 10000;
+        }
+        .auth-card.active { display: block; animation: fadeIn 0.4s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .logo-box { font-size: 60px; margin-bottom: 20px; display: inline-block; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); }
+        
+        input { 
+            width: 100%; padding: 15px; margin: 12px 0; border: 1.5px solid #eee; 
+            border-radius: 14px; font-size: 16px; box-sizing: border-box; 
+            outline: none; transition: 0.3s; background: #f9f9f9;
+        }
+        input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(0,136,204,0.1); }
+
+        .btn { 
+            width: 100%; padding: 16px; background: var(--primary); color: white; 
+            border: none; border-radius: 14px; font-weight: bold; font-size: 16px; 
+            cursor: pointer; transition: 0.3s; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,136,204,0.3);
+        }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
         .btn:active { transform: scale(0.98); }
-        .btn-text { color: var(--primary); background: none; border: none; cursor: pointer; margin-top: 15px; font-weight: 600; }
+
+        .btn-text { 
+            display: block; width: 100%; color: var(--primary); background: none; 
+            border: none; cursor: pointer; margin-top: 20px; font-weight: 600; font-size: 15px;
+        }
 
         /* --- MAIN APP --- */
         .app { display: none; flex-direction: column; height: 100vh; background: white; }
-        .header { background: var(--glass); backdrop-filter: blur(10px); padding: 12px 16px; display: flex; align-items: center; border-bottom: 1px solid #eee; z-index: 100; }
-        .search-box { flex: 1; margin: 0 15px; background: #f1f3f4; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; }
-        .search-box input { background: none; border: none; margin: 0; padding: 8px; }
-
-        .content { flex: 1; overflow-y: auto; background: white; }
-        .item-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; }
-        .item-row:hover { background: #f9f9f9; }
+        .header { background: var(--glass); backdrop-filter: blur(15px); padding: 12px 16px; display: flex; align-items: center; border-bottom: 1px solid #eee; z-index: 500; }
         
-        .avatar { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; background-size: cover; flex-shrink: 0; }
+        .search-box { 
+            flex: 1; margin: 0 15px; background: #f1f3f4; border-radius: 14px; 
+            display: flex; align-items: center; padding: 0 15px; 
+        }
+        .search-box input { background: none; border: none; margin: 0; padding: 10px; width: 100%; }
+
+        /* --- CONTENT --- */
+        .content { flex: 1; overflow-y: auto; background: white; }
+        .item-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid #f8f8f8; cursor: pointer; transition: 0.2s; }
+        .item-row:hover { background: #f0f8ff; }
+        
+        .avatar { 
+            width: 56px; height: 56px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; color: white; 
+            font-weight: bold; font-size: 22px; background-size: cover; flex-shrink: 0; 
+        }
 
         /* --- SIDEBAR --- */
-        .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; background: white; z-index: 4000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; background: white; z-index: 8000; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.2); }
         .sidebar.active { left: 0; }
-        .sb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 3900; display: none; backdrop-filter: blur(2px); }
-        .sb-header { background: var(--primary); color: white; padding: 30px 20px; }
-        .acc-list { max-height: 150px; overflow-y: auto; border-bottom: 1px solid #eee; background: #fafafa; }
-        .acc-item { padding: 10px 20px; display: flex; align-items: center; font-size: 14px; cursor: pointer; }
+        .sb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 7900; display: none; backdrop-filter: blur(3px); }
+        .sb-header { background: linear-gradient(to bottom right, #0088cc, #005588); color: white; padding: 40px 20px 20px; }
 
         /* --- CHAT VIEW --- */
-        .chat-view { position: fixed; inset: 0; background: #e7ecef; z-index: 2000; display: none; flex-direction: column; }
+        .chat-view { position: fixed; inset: 0; background: #e7ecef; z-index: 6000; display: none; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
         .chat-head { background: white; padding: 10px 16px; display: flex; align-items: center; border-bottom: 1px solid #ddd; }
-        .msg-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-        .bubble { background: white; padding: 10px 14px; border-radius: 16px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); position: relative; }
-        .bubble.my { align-self: flex-end; background: #effdde; }
+        .msg-container { flex: 1; padding: 20px 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .bubble { background: white; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 75%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 15px; line-height: 1.4; }
+        .bubble.my { align-self: flex-end; background: #0088cc; color: white; border-radius: 18px 18px 4px 18px; }
 
         /* --- FAB --- */
-        .fab { position: fixed; bottom: 25px; right: 25px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 4px 15px rgba(0,136,204,0.4); cursor: pointer; z-index: 300; }
-        .fab-menu { position: fixed; bottom: 95px; right: 25px; display: none; flex-direction: column; gap: 10px; z-index: 300; }
+        .fab { position: fixed; bottom: 30px; right: 25px; background: var(--primary); color: white; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 6px 20px rgba(0,136,204,0.4); cursor: pointer; z-index: 1000; transition: 0.3s; }
+        .fab:hover { transform: rotate(90deg) scale(1.1); }
+        .fab-menu { position: fixed; bottom: 105px; right: 25px; display: none; flex-direction: column; gap: 12px; z-index: 1000; }
 
-        .modal { position: fixed; inset: 0; background: white; z-index: 4500; display: none; padding: 25px; }
+        .modal { position: fixed; inset: 0; background: white; z-index: 9000; display: none; padding: 30px; animation: fadeIn 0.3s; }
     </style>
 </head>
 <body>
@@ -64,26 +101,26 @@
 <div class="auth-screen" id="auth-screen">
     <div class="auth-card active" id="card-welcome">
         <div class="logo-box">💎</div>
-        <h1 style="margin:0">Daugram</h1>
-        <p style="color:#666">Добро пожаловать</p>
+        <h1 style="margin:0; font-size:32px">Daugram</h1>
+        <p style="color:#666; margin-bottom:30px">Премиум мессенджер нового поколения</p>
         <button class="btn" onclick="showAuth('reg')">Зарегистрироваться</button>
-        <button class="btn-text" onclick="showAuth('login')">У меня есть аккаунт</button>
+        <button class="btn-text" onclick="showAuth('login')">У меня уже есть аккаунт</button>
     </div>
 
     <div class="auth-card" id="card-reg">
-        <h3>Новый аккаунт</h3>
+        <h2 style="margin-top:0">Создать аккаунт</h2>
         <input type="email" id="reg-email" placeholder="Email (@gmail.com)">
         <input type="password" id="reg-pass1" placeholder="Пароль">
         <input type="password" id="reg-pass2" placeholder="Повторите пароль">
         <input type="text" id="reg-name" placeholder="Имя">
         <input type="text" id="reg-surname" placeholder="Фамилия (опционально)">
         <input type="text" id="reg-user" placeholder="Юзернейм (только латиница)">
-        <button class="btn" onclick="handleRegister()">Создать аккаунт</button>
+        <button class="btn" onclick="handleRegister()">Зарегистрироваться</button>
         <button class="btn-text" onclick="showAuth('welcome')">Назад</button>
     </div>
 
     <div class="auth-card" id="card-login">
-        <h3>Вход</h3>
+        <h2 style="margin-top:0">Вход</h2>
         <input type="email" id="login-email" placeholder="Email">
         <input type="password" id="login-pass" placeholder="Пароль">
         <button class="btn" onclick="handleLogin()">Войти</button>
@@ -93,17 +130,15 @@
 
 <div class="app" id="app">
     <div class="header">
-        <div style="font-size:24px; cursor:pointer" onclick="toggleSidebar(true)">☰</div>
+        <div style="font-size:28px; cursor:pointer" onclick="toggleSidebar(true)">☰</div>
         <div class="search-box">
-            <input type="text" id="search" placeholder="Поиск..." oninput="doSearch()">
+            <input type="text" id="search" placeholder="Поиск в Daugram..." oninput="doSearch()">
         </div>
     </div>
-
     <div class="content" id="chat-list"></div>
-
     <div class="fab-menu" id="fab-menu">
-        <button class="btn" style="width:auto; padding:10px 20px" onclick="openCreate('group')">👥 Группа</button>
-        <button class="btn" style="width:auto; padding:10px 20px" onclick="openCreate('channel')">📢 Канал</button>
+        <button class="btn" style="width:auto; padding:12px 24px" onclick="openCreate('group')">👥 Группа</button>
+        <button class="btn" style="width:auto; padding:12px 24px" onclick="openCreate('channel')">📢 Канал</button>
     </div>
     <div class="fab" onclick="toggleFab()">+</div>
 </div>
@@ -111,46 +146,46 @@
 <div class="sb-overlay" id="overlay" onclick="toggleSidebar(false)"></div>
 <div class="sidebar" id="sidebar">
     <div class="sb-header">
-        <div id="u-av" class="avatar" style="width:65px; height:65px; margin-bottom:12px; border:3px solid rgba(255,255,255,0.3)"></div>
-        <div id="u-name" style="font-weight:bold; font-size:18px">Name</div>
-        <div id="u-user" style="opacity:0.8; font-size:14px">@user</div>
+        <div id="u-av" class="avatar" style="width:70px; height:70px; margin-bottom:15px; border:3px solid rgba(255,255,255,0.4)"></div>
+        <div id="u-name" style="font-weight:bold; font-size:20px">Daugram User</div>
+        <div id="u-user" style="opacity:0.8; font-size:14px">@username</div>
     </div>
-    <div class="acc-list" id="acc-list"></div>
-    <div style="padding:10px 0">
-        <div class="acc-item" onclick="showAuth('welcome', true)">➕ Добавить аккаунт</div>
-        <div class="acc-item" onclick="showModal('profile')">⚙️ Мой профиль</div>
-        <div class="acc-item" style="color:#e74c3c" onclick="logout()">🚪 Выйти</div>
+    <div class="acc-list" id="acc-list" style="max-height: 200px; overflow-y: auto; background: #f9f9f9; border-bottom: 1px solid #eee;"></div>
+    <div style="padding:15px 0">
+        <div class="item-row" style="padding: 12px 20px" onclick="showAuth('welcome', true)">➕ Добавить аккаунт</div>
+        <div class="item-row" style="padding: 12px 20px" onclick="showModal('profile')">⚙️ Мой профиль</div>
+        <div class="item-row" style="padding: 12px 20px; color:#e74c3c" onclick="logout()">🚪 Выйти</div>
     </div>
 </div>
 
 <div class="chat-view" id="chat-view">
     <div class="chat-head">
-        <button onclick="closeChat()" style="border:none; background:none; font-size:24px">←</button>
-        <div id="h-av" class="avatar" style="width:40px; height:40px; margin: 0 12px"></div>
-        <div id="h-name" style="font-weight:bold; flex:1">Support</div>
+        <button onclick="closeChat()" style="border:none; background:none; font-size:26px; cursor:pointer">←</button>
+        <div id="h-av" class="avatar" style="width:42px; height:42px; margin: 0 15px"></div>
+        <div id="h-name" style="font-weight:bold; flex:1; font-size:18px">Support</div>
     </div>
     <div class="msg-container" id="msg-box"></div>
-    <div class="input-area" id="inp-area" style="background:white; padding:10px; display:flex; align-items:center; gap:10px">
-        <input type="text" id="m-input" placeholder="Сообщение..." style="margin:0">
-        <button class="btn" style="width:auto; margin:0; padding:10px 20px" onclick="send()">🕊️</button>
+    <div style="background:white; padding:15px; display:flex; align-items:center; gap:12px; border-top:1px solid #eee">
+        <input type="text" id="m-input" placeholder="Напишите сообщение..." style="margin:0; background:#f1f3f4; border:none">
+        <button class="btn" style="width:auto; margin:0; padding:12px 20px" onclick="send()">🕊️</button>
     </div>
 </div>
 
 <div class="modal" id="modal-profile">
-    <h2>Профиль</h2>
+    <h2>Настройки профиля</h2>
     <input type="text" id="edit-name" placeholder="Имя">
     <input type="text" id="edit-user" placeholder="Юзернейм">
     <input type="text" id="edit-bio" placeholder="О себе">
-    <input type="text" id="edit-av" placeholder="URL фото">
-    <button class="btn" onclick="saveProfile()">Сохранить</button>
+    <input type="text" id="edit-av" placeholder="URL фото профиля">
+    <button class="btn" onclick="saveProfile()">Сохранить изменения</button>
     <button class="btn-text" onclick="closeModal()">Закрыть</button>
 </div>
 
 <script>
     let users = JSON.parse(localStorage.getItem('dq_users')) || [];
-    let curIdx = localStorage.getItem('dq_cur') || 0;
-    let items = JSON.parse(localStorage.getItem('dq_items')) || []; // Группы/каналы
-    let colors = ['#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#1abc9c'];
+    let curIdx = parseInt(localStorage.getItem('dq_cur')) || 0;
+    let items = JSON.parse(localStorage.getItem('dq_items')) || []; 
+    let colors = ['#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22'];
 
     if(users.length > 0) initApp();
 
@@ -166,16 +201,19 @@
         const p1 = document.getElementById('reg-pass1').value;
         const p2 = document.getElementById('reg-pass2').value;
         const name = document.getElementById('reg-name').value;
-        const user = document.getElementById('reg-user').value.toLowerCase().replace('@','');
+        const user = document.getElementById('reg-user').value.toLowerCase().trim().replace('@','');
 
-        if(!email.endsWith('@gmail.com')) return alert('Почта только @gmail.com!');
+        if(!email.endsWith('@gmail.com')) return alert('Почта должна заканчиваться на @gmail.com!');
+        if(p1.length < 4) return alert('Пароль слишком короткий!');
         if(p1 !== p2) return alert('Пароли не совпадают!');
-        if(!/^[a-z0-9_]+$/.test(user)) return alert('Юзернейм: только латинские буквы и цифры!');
-        if(users.find(u => u.user === user)) return alert('Юзернейм уже занят!');
+        if(!name) return alert('Имя обязательно!');
+        if(!/^[a-z0-9_]+$/.test(user)) return alert('Юзернейм: только латиница (a-z) и цифры!');
+        if(users.find(u => u.user === user)) return alert('Этот юзернейм уже занят!');
 
-        const newUser = { email, pass: p1, name, user, bio: '', av: '', chats: [
-            { id: 'supp', name: 'Daugram Support', type: 'bot', msgs: [{t: 'Вы успешно зарегистрировали аккаунт!', my: false}] }
-        ]};
+        const newUser = { 
+            email, pass: p1, name, user, bio: '', av: '', 
+            chats: [{ id: 'supp', name: 'Daugram Support', type: 'bot', msgs: [{t: 'Добро пожаловать в Daugram! Ваш аккаунт успешно создан.', my: false}] }] 
+        };
         users.push(newUser);
         curIdx = users.length - 1;
         save();
@@ -186,12 +224,136 @@
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-pass').value;
         const uIdx = users.findIndex(u => u.email === email && u.pass === pass);
-        if(uIdx === -1) return alert('Неверный логин или пароль!');
+        if(uIdx === -1) return alert('Неверный Email или пароль!');
         curIdx = uIdx;
         save();
         initApp();
     }
 
     function initApp() {
-        document.
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        updateSidebar();
+        renderList();
+    }
+
+    function renderList(f = '') {
+        const box = document.getElementById('chat-list');
+        box.innerHTML = '';
+        const me = users[curIdx];
+        if(!me) return;
+        const myItems = [...me.chats, ...items.filter(i => i.creator === me.user)];
+        
+        myItems.filter(i => i.name.toLowerCase().includes(f.toLowerCase())).forEach(i => {
+            const color = colors[i.name.length % colors.length];
+            box.innerHTML += `
+                <div class="item-row" onclick="openChat('${i.id}')">
+                    <div class="avatar" style="background-color:${color}">${i.name[0]}</div>
+                    <div style="margin-left:16px; flex:1">
+                        <div style="font-weight:bold; font-size:16px">${i.name} ${i.type === 'channel' ? '📢' : ''}</div>
+                        <div style="color:#888; font-size:13px; margin-top:3px">${i.type === 'bot' ? 'Системное уведомление' : 'd.me/'+(i.user||i.id)}</div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    let activeId = null;
+    function openChat(id) {
+        activeId = id;
+        const me = users[curIdx];
+        const chat = [...me.chats, ...items].find(c => c.id === id);
+        document.getElementById('chat-view').style.display = 'flex';
+        document.getElementById('h-name').innerText = chat.name;
+        const av = document.getElementById('h-av');
+        av.style.backgroundColor = colors[chat.name.length % colors.length];
+        av.innerText = chat.name[0];
+        renderMsgs();
+    }
+
+    function send() {
+        const val = document.getElementById('m-input').value;
+        if(!val.trim()) return;
+        const me = users[curIdx];
+        const chat = [...me.chats, ...items].find(c => c.id === activeId);
+        chat.msgs.push({ t: val, my: true });
+        document.getElementById('m-input').value = '';
+        save();
+        renderMsgs();
+    }
+
+    function renderMsgs() {
+        const box = document.getElementById('msg-box'); box.innerHTML = '';
+        const me = users[curIdx];
+        const chat = [...me.chats, ...items].find(c => c.id === activeId);
+        chat.msgs.forEach(m => {
+            box.innerHTML += `<div class="bubble ${m.my ? 'my' : ''}">${m.t}</div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function openCreate(type) {
+        const name = prompt(type === 'group' ? 'Название группы:' : 'Название канала:');
+        if(!name) return;
+        const user = prompt('Придумайте короткую ссылку (юзернейм):');
+        const newItem = { id: Date.now().toString(), type, name, user, creator: users[curIdx].user, msgs: [] };
+        items.push(newItem);
+        save();
+        renderList();
+        toggleFab();
+    }
+
+    function updateSidebar() {
+        const me = users[curIdx];
+        if(!me) return;
+        document.getElementById('u-name').innerText = me.name;
+        document.getElementById('u-user').innerText = '@' + me.user;
+        const av = document.getElementById('u-av');
+        if(me.av) { av.style.backgroundImage = `url(${me.av})`; av.innerText = ""; }
+        else { av.style.backgroundColor = colors[me.name.length % colors.length]; av.innerText = me.name[0]; av.style.backgroundImage = "none"; }
+        
+        const al = document.getElementById('acc-list'); al.innerHTML = '';
+        users.forEach((u, i) => {
+            al.innerHTML += `<div class="item-row" style="padding:10px 20px; font-size:14px" onclick="switchAcc(${i})">${i == curIdx ? '✅' : '👤'} ${u.name}</div>`;
+        });
+    }
+
+    function switchAcc(i) { curIdx = i; save(); initApp(); toggleSidebar(false); }
+    function toggleSidebar(s) { 
+        document.getElementById('sidebar').classList.toggle('active', s);
+        document.getElementById('overlay').style.display = s ? 'block' : 'none';
+    }
+    function toggleFab() { 
+        const m = document.getElementById('fab-menu'); 
+        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
+    }
+    function closeChat() { document.getElementById('chat-view').style.display = 'none'; }
+    function showModal(id) { 
+        const me = users[curIdx];
+        document.getElementById('edit-name').value = me.name;
+        document.getElementById('edit-user').value = me.user;
+        document.getElementById('edit-bio').value = me.bio;
+        document.getElementById('edit-av').value = me.av;
+        document.getElementById('modal-'+id).style.display = 'block'; 
+        toggleSidebar(false);
+    }
+    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+    function saveProfile() {
+        const me = users[curIdx];
+        me.name = document.getElementById('edit-name').value;
+        me.user = document.getElementById('edit-user').value;
+        me.bio = document.getElementById('edit-bio').value;
+        me.av = document.getElementById('edit-av').value;
+        save(); initApp(); closeModal();
+    }
+    function doSearch() { renderList(document.getElementById('search').value); }
+    function save() { 
+        localStorage.setItem('dq_users', JSON.stringify(users)); 
+        localStorage.setItem('dq_items', JSON.stringify(items));
+        localStorage.setItem('dq_cur', curIdx); 
+    }
+    function logout() { localStorage.clear(); location.reload(); }
+</script>
+
+</body>
+</html>
 
