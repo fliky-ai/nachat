@@ -3,280 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TG Clone Mini App</title>
+    <title>Telegram Pro Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --tg-blue: #248bcf;
             --tg-bg: #ffffff;
-            --tg-secondary: #f4f4f5;
+            --tg-secondary: #f0f2f5;
             --tg-text: #000000;
             --tg-hint: #999999;
-            --vip-gold: #ffd700;
+            --chat-bg: #e7ecef;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: var(--tg-bg);
-            color: var(--tg-text);
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--tg-bg); color: var(--tg-text); overflow: hidden; height: 100vh; }
 
-        /* Navigation Bar */
-        .nav-bar {
-            display: flex;
-            justify-content: space-around;
-            background: var(--tg-bg);
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-item {
-            padding: 15px;
-            font-weight: 500;
-            color: var(--tg-hint);
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            transition: 0.3s;
-        }
-        .nav-item.active {
-            color: var(--tg-blue);
-            border-bottom: 3px solid var(--tg-blue);
-        }
+        /* Auth Screen */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .auth-card { width: 100%; max-width: 350px; }
+        .auth-logo { width: 80px; margin-bottom: 20px; }
+        input.auth-input { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input.auth-input:focus { border-color: var(--tg-blue); }
+        .btn-blue { width: 100%; padding: 15px; background: var(--tg-blue); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
 
-        /* Content Sections */
-        .page { display: none; padding-bottom: 80px; }
+        /* App Layout */
+        .app-container { display: none; flex-direction: column; height: 100vh; }
+        .header { padding: 15px; font-weight: bold; font-size: 18px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        
+        .nav-bar { display: flex; border-bottom: 1px solid #eee; background: white; }
+        .nav-item { flex: 1; text-align: center; padding: 15px; color: var(--tg-hint); font-weight: 500; cursor: pointer; }
+        .nav-item.active { color: var(--tg-blue); border-bottom: 2px solid var(--tg-blue); }
+
+        /* Content */
+        .content { flex: 1; overflow-y: auto; position: relative; }
+        .page { display: none; height: 100%; }
         .page.active { display: block; }
 
-        /* Profile Page */
-        .profile-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background: var(--tg-secondary);
-        }
-        .avatar-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .main-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ddd;
-        }
-        .vip-frame {
-            border: 4px solid var(--vip-gold) !important;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-        .vip-tag {
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--vip-gold);
-            color: black;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: none;
-        }
+        /* Avatar System */
+        .avatar { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; background-size: cover; background-position: center; text-transform: uppercase; }
 
-        .input-field {
-            width: 90%;
-            background: white;
-            margin: 10px 0;
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .input-field label { font-size: 12px; color: var(--tg-blue); display: block; }
-        .input-field input, .input-field textarea {
-            border: none; width: 100%; outline: none; font-size: 16px; margin-top: 5px;
-        }
-
-        /* Chat List */
-        .chat-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .chat-item img { width: 55px; height: 55px; border-radius: 50%; margin-right: 15px; }
-        .chat-info { flex: 1; }
+        /* List Items */
+        .chat-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
+        .chat-info { margin-left: 15px; flex: 1; }
         .chat-info h4 { margin: 0; font-size: 16px; }
-        .chat-info p { margin: 5px 0 0; font-size: 14px; color: var(--tg-hint); }
+        .chat-info p { margin: 4px 0 0; font-size: 14px; color: var(--tg-hint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Floating Button */
-        .fab {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            background: var(--tg-blue);
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(36, 139, 207, 0.4);
-            font-size: 30px;
-            cursor: pointer;
-        }
+        /* Group View */
+        #chat-view { position: fixed; inset: 0; background: var(--chat-bg); z-index: 2000; display: none; flex-direction: column; }
+        .chat-header { background: white; padding: 10px 15px; display: flex; align-items: center; border-bottom: 1px solid #ddd; }
+        .messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .msg { background: white; padding: 10px 14px; border-radius: 15px; max-width: 75%; font-size: 15px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg.my { align-self: flex-end; background: #effdde; }
+        .msg-name { font-size: 11px; font-weight: bold; color: var(--tg-blue); margin-bottom: 4px; display: block; }
 
-        .btn-save {
-            background: var(--tg-blue);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-top: 20px;
-            width: 90%;
-        }
+        .input-area { background: white; padding: 10px 15px; display: flex; align-items: center; gap: 10px; padding-bottom: 30px; }
+        .input-area input { flex: 1; border: 1.5px solid #eee; border-radius: 25px; padding: 10px 18px; outline: none; background: #f9f9f9; }
+
+        /* Profile Styles */
+        .p-card { background: var(--tg-secondary); margin: 15px; border-radius: 15px; padding: 20px; text-align: center; }
+        .fab { position: fixed; bottom: 25px; right: 25px; background: var(--tg-blue); color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 15px rgba(36,139,207,0.4); }
     </style>
 </head>
 <body>
 
-<div class="nav-bar">
-    <div class="nav-item active" onclick="openTab('chats', this)">Чаттар</div>
-    <div class="nav-item" onclick="openTab('groups', this)">Топтар</div>
-    <div class="nav-item" onclick="openTab('settings', this)">Баптаулар</div>
-</div>
+<div id="auth-screen">
+    <div class="auth-card" id="auth-phone">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="auth-logo">
+        <h2>Telegram-ға кіру</h2>
+        <p style="color: grey;">Телефон нөміріңізді енгізіңіз</p>
+        <input type="tel" id="login-phone" class="auth-input" placeholder="+7 707 000 0000">
+        <button class="btn-blue" onclick="sendCode()">Келесі</button>
+    </div>
 
-<div id="chats" class="page active">
-    <div class="chat-item">
-        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png">
-        <div class="chat-info">
-            <h4>Telegram Support</h4>
-            <p>Қош келдіңіз! Бұл сіздің жеке мессенджеріңіз.</p>
-        </div>
+    <div class="auth-card" id="auth-code" style="display:none">
+        <h2>Тексеру коды</h2>
+        <p style="color: grey;">Біз сізге 5 таңбалы код жібердік</p>
+        <input type="number" id="login-code" class="auth-input" placeholder="00000">
+        <button class="btn-blue" onclick="verifyCode()">Растау</button>
+    </div>
+
+    <div class="auth-card" id="auth-name" style="display:none">
+        <h2>Атыңызды жазыңыз</h2>
+        <input type="text" id="login-name" class="auth-input" placeholder="Есіміңіз">
+        <button class="btn-blue" onclick="finishRegistration()">Дайын</button>
     </div>
 </div>
 
-<div id="groups" class="page">
-    <div id="group-container">
-        <div class="chat-item">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-            <div class="chat-info">
-                <h4>Жалпы топ</h4>
-                <p>Бұл әзірге жалғыз топ</p>
+<div class="app-container" id="app">
+    <div class="header">
+        <span>Telegram Clone</span>
+        <span style="color: var(--tg-blue);" id="top-name">User</span>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('chats', this)">Чаттар</div>
+        <div class="nav-item" onclick="switchTab('groups', this)">Топтар</div>
+        <div class="nav-item" onclick="switchTab('profile', this)">Профиль</div>
+    </div>
+
+    <div class="content">
+        <div id="chats" class="page active">
+            <div class="chat-item">
+                <div class="avatar" style="background: #f39c12;">T</div>
+                <div class="chat-info"><h4>Telegram Support</h4><p>Бұл жерде сіздің жеке чаттарыңыз болады.</p></div>
+            </div>
+        </div>
+
+        <div id="groups" class="page">
+            <div id="group-list"></div>
+            <div class="fab" onclick="modalCreateGroup()">+</div>
+        </div>
+
+        <div id="profile" class="page">
+            <div class="p-card">
+                <div id="my-avatar" class="avatar" style="width:100px; height:100px; margin: 0 auto; font-size: 40px;" onclick="changeMyPhoto()"></div>
+                <h2 id="p-display-name">Name</h2>
+                <p id="p-display-phone" style="color: var(--tg-hint);">+7 000 000</p>
+            </div>
+            <div style="padding: 15px;">
+                <button class="btn-blue" style="background: #ff4d4d;" onclick="logout()">Шығу</button>
             </div>
         </div>
     </div>
-    <div class="fab" onclick="createNewGroup()">+</div>
 </div>
 
-<div id="settings" class="page">
-    <div class="profile-container">
-        <div class="avatar-wrapper" id="avatarFrame">
-            <img src="https://via.placeholder.com/100" id="userImg" class="main-avatar">
-            <div class="vip-tag" id="vipTag">VIP</div>
+<div id="chat-view">
+    <div class="chat-header">
+        <button onclick="closeChat()" style="border:none; background:none; font-size:24px; margin-right:15px;">←</button>
+        <div id="chat-av" class="avatar" style="width:35px; height:35px; font-size:14px;"></div>
+        <div style="margin-left:12px;">
+            <div id="chat-name" style="font-weight:bold;">Топ</div>
+            <div style="font-size:11px; color: var(--tg-hint);">онлайн</div>
         </div>
-        <h2 id="nameLabel">Аты-жөні</h2>
-        <p id="userLabel" style="color: var(--tg-blue); margin: 0;">@username</p>
     </div>
-
-    <center>
-        <div class="input-field">
-            <label>Толық есіміңіз</label>
-            <input type="text" id="inpName" placeholder="Атыңызды енгізіңіз">
-        </div>
-        <div class="input-field">
-            <label>Юзернейм</label>
-            <input type="text" id="inpUser" placeholder="@username">
-        </div>
-        <div class="input-field">
-            <label>Өзіңіз туралы (Био)</label>
-            <textarea id="inpBio" rows="2" placeholder="Сипаттама жазыңыз..."></textarea>
-        </div>
-        <div class="input-field">
-            <label>Аватар URL</label>
-            <input type="text" id="inpImg" placeholder="Сурет сілтемесі">
-        </div>
-
-        <button class="btn-save" onclick="saveProfile()">Сақтау</button>
-        <button onclick="activateVip()" style="margin-top: 15px; background: none; border: 1px solid gold; color: orange; padding: 5px 10px; border-radius: 5px;">VIP Мәртебесін алу</button>
-    </center>
+    <div class="messages" id="msg-box"></div>
+    <div class="input-area">
+        <input type="text" id="msg-input" placeholder="Хабарлама жазу...">
+        <button onclick="sendMsg()" style="border:none; background:none; color: var(--tg-blue); font-weight:bold;">Жіберу</button>
+    </div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    let user = JSON.parse(localStorage.getItem('tg_user')) || null;
+    let groups = JSON.parse(localStorage.getItem('tg_groups')) || [];
+    let colors = ['#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22'];
+    let activeGroupId = null;
 
-    // Мәліметтерді жүктеу (LocalStorage)
-    window.onload = function() {
-        const savedData = JSON.parse(localStorage.getItem('tgUser')) || {};
-        if(savedData.name) {
-            document.getElementById('inpName').value = savedData.name;
-            document.getElementById('nameLabel').innerText = savedData.name;
-        }
-        if(savedData.user) {
-            document.getElementById('inpUser').value = savedData.user;
-            document.getElementById('userLabel').innerText = savedData.user;
-        }
-        if(savedData.bio) document.getElementById('inpBio').value = savedData.bio;
-        if(savedData.img) {
-            document.getElementById('inpImg').value = savedData.img;
-            document.getElementById('userImg').src = savedData.img;
-        }
-        if(savedData.isVip) activateVip(true);
-    };
+    if(user) showMain();
 
-    function openTab(id, el) {
+    // AUTH LOGIC
+    function sendCode() {
+        if(document.getElementById('login-phone').value.length < 5) return alert("Номерді дұрыс жаз!");
+        document.getElementById('auth-phone').style.display = 'none';
+        document.getElementById('auth-code').style.display = 'block';
+    }
+
+    function verifyCode() {
+        if(document.getElementById('login-code').value === "") return alert("Кодты жаз!");
+        document.getElementById('auth-code').style.display = 'none';
+        document.getElementById('auth-name').style.display = 'block';
+    }
+
+    function finishRegistration() {
+        const name = document.getElementById('login-name').value;
+        if(!name) return alert("Атыңды жаз!");
+        user = {
+            name: name,
+            phone: document.getElementById('login-phone').value,
+            photo: null,
+            id: Date.now()
+        };
+        localStorage.setItem('tg_user', JSON.stringify(user));
+        showMain();
+    }
+
+    function showMain() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        updateProfileUI();
+        renderGroups();
+    }
+
+    // PROFILE UI
+    function updateProfileUI() {
+        document.getElementById('top-name').innerText = user.name;
+        document.getElementById('p-display-name').innerText = user.name;
+        document.getElementById('p-display-phone').innerText = user.phone;
+        
+        const av = document.getElementById('my-avatar');
+        setAvatar(av, user.name, user.photo);
+    }
+
+    function setAvatar(element, name, photoUrl) {
+        if(photoUrl) {
+            element.style.backgroundImage = `url(${photoUrl})`;
+            element.innerText = "";
+        } else {
+            element.style.backgroundImage = "none";
+            element.style.backgroundColor = colors[name.length % colors.length];
+            element.innerText = name.charAt(0);
+        }
+    }
+
+    function changeMyPhoto() {
+        const url = prompt("Фото URL сілтемесін енгізіңіз:");
+        if(url) {
+            user.photo = url;
+            localStorage.setItem('tg_user', JSON.stringify(user));
+            updateProfileUI();
+        }
+    }
+
+    // TABS
+    function switchTab(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
 
-    function saveProfile() {
-        const data = {
-            name: document.getElementById('inpName').value,
-            user: document.getElementById('inpUser').value,
-            bio: document.getElementById('inpBio').value,
-            img: document.getElementById('inpImg').value,
-            isVip: document.getElementById('userImg').classList.contains('vip-frame')
-        };
-        
-        localStorage.setItem('tgUser', JSON.stringify(data));
-        document.getElementById('nameLabel').innerText = data.name;
-        document.getElementById('userLabel').innerText = data.user;
-        document.getElementById('userImg').src = data.img || "https://via.placeholder.com/100";
-        
-        alert("Профиль сақталды!");
-    }
-
-    function activateVip(isLoad = false) {
-        document.getElementById('userImg').classList.add('vip-frame');
-        document.getElementById('vipTag').style.display = 'block';
-        if(!isLoad) alert("Құттықтаймыз! Сіз VIP болдыңыз және алтын рамка алдыңыз.");
-    }
-
-    function createNewGroup() {
-        const name = prompt("Топ атауын енгізіңіз:");
-        const bio = prompt("Топ сипаттамасы:");
+    // GROUPS LOGIC
+    function modalCreateGroup() {
+        const name = prompt("Топ атауы:");
         if(name) {
-            const container = document.getElementById('group-container');
-            const html = `
-                <div class="chat-item">
-                    <img src="https://cdn-icons-png.flaticon.com/512/681/681494.png">
-                    <div class="chat-info">
-                        <h4>${name}</h4>
-                        <p>${bio || 'Сипаттама жоқ'}</p>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += html;
+            const newGroup = { id: Date.now(), name: name, messages: [] };
+            groups.push(newGroup);
+            localStorage.setItem('tg_groups', JSON.stringify(groups));
+            renderGroups();
         }
+    }
+
+    function renderGroups() {
+        const list = document.getElementById('group-list');
+        list.innerHTML = "";
+        groups.forEach(g => {
+            list.innerHTML += `
+                <div class="chat-item" onclick="openChat(${g.id})">
+                    <div class="avatar" style="background-color: ${colors[g.name.length % colors.length]}">${g.name.charAt(0)}</div>
+                    <div class="chat-info">
+                        <h4>${g.name}</h4>
+                        <p>${g.messages.length > 0 ? g.messages[g.messages.length-1].text : 'Хабарлама жоқ'}</p>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function openChat(id) {
+        activeGroupId = id;
+        const g = groups.find(x => x.id === id);
+        document.getElementById('chat-view').style.display = 'flex';
+        document.getElementById('chat-name').innerText = g.name;
+        const cav = document.getElementById('chat-av');
+        cav.innerText = g.name.charAt(0);
+        cav.style.backgroundColor = colors[g.name.length % colors.length];
+        renderMessages();
+    }
+
+    function closeChat() { document.getElementById('chat-view').style.display = 'none'; }
+
+    function sendMsg() {
+        const inp = document.getElementById('msg-input');
+        if(!inp.value.trim()) return;
+        const g = groups.find(x => x.id === activeGroupId);
+        g.messages.push({
+            sender: user.name,
+            text: inp.value,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+        localStorage.setItem('tg_groups', JSON.stringify(groups));
+        inp.value = "";
+        renderMessages();
+        renderGroups(); // Update last message in list
+    }
+
+    function renderMessages() {
+        const box = document.getElementById('msg-box');
+        box.innerHTML = "";
+        const g = groups.find(x => x.id === activeGroupId);
+        g.messages.forEach(m => {
+            const isMy = m.sender === user.name;
+            box.innerHTML += `
+                <div class="msg ${isMy ? 'my' : ''}">
+                    ${!isMy ? `<span class="msg-name">${m.sender}</span>` : ''}
+                    ${m.text}
+                    <div style="font-size: 9px; color: grey; text-align: right; margin-top: 4px;">${m.time}</div>
+                </div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function logout() {
+        localStorage.removeItem('tg_user');
+        location.reload();
     }
 </script>
 
