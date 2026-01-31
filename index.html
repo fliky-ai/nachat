@@ -1,27 +1,29 @@
-here<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daugram Elite - Pro Edition</title>
+    <title>Daugram Elite - Ultimate Edition</title>
     <style>
         :root { --tg-blue: #24a1de; --tg-bg: #ffffff; --tg-sent: #effdde; --tg-gray: #8e8e93; --blur: saturate(180%) blur(20px); }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: -apple-system, sans-serif; background: #e7ecef; overflow: hidden; }
         
-        /* AUTH STYLE */
+        /* AUTH */
         .auth-screen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #24a1de, #0088cc); display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: var(--blur); width: 100%; max-width: 380px; padding: 40px; border-radius: 30px; text-align: center; display: none; }
         .auth-card.active { display: block; }
         input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 15px; font-size: 16px; box-sizing: border-box; outline: none; background: #f5f5f5; }
-        .btn { width: 100%; padding: 16px; background: var(--tg-blue); color: #fff; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        .btn { width: 100%; padding: 16px; background: var(--tg-blue); color: #fff; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* APP STRUCTURE */
+        /* MAIN APP */
         .app { display: none; height: 100vh; flex-direction: column; background: #fff; }
         .header { height: 60px; padding: 0 16px; display: flex; align-items: center; border-bottom: 1px solid #eee; background: #fff; z-index: 100; }
         .search-box { flex: 1; margin-left: 15px; background: #f1f1f2; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; }
-        .search-box input { background: none; border: none; padding: 8px; width: 100%; }
+        .search-box input { background: none; border: none; padding: 8px; width: 100%; outline: none; }
         .chat-list { flex: 1; overflow-y: auto; }
-        .chat-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 0.5px solid #f0f0f0; }
+        .chat-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 0.5px solid #f0f0f0; transition: 0.2s; }
+        .chat-item:active { background: #f0f0f0; }
         .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--tg-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; flex-shrink: 0; background-size: cover; }
 
         /* CHAT VIEW */
@@ -31,59 +33,64 @@ here<!DOCTYPE html>
         .msg { max-width: 80%; padding: 10px 14px; border-radius: 18px; font-size: 15px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); word-wrap: break-word; }
         .msg.received { background: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
         .msg.sent { background: var(--tg-sent); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
-
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; display: block; }
+        
         /* INPUT AREA */
         .input-area { background: #fff; padding: 10px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; }
-        .icon-btn { font-size: 24px; cursor: pointer; color: var(--tg-gray); user-select: none; }
+        .icon-btn { font-size: 24px; cursor: pointer; color: var(--tg-gray); user-select: none; transition: 0.2s; }
+        .icon-btn:active { transform: scale(1.2); color: var(--tg-blue); }
         .voice-rec { color: #f44336 !important; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         /* MODALS */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; width: 90%; max-width: 380px; padding: 25px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
         
         /* SIDEBAR */
-        .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; background: #fff; z-index: 1000; transition: 0.3s; box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
+        .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; background: #fff; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
         .sidebar.active { left: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 900; display: none; }
 
         /* FAB */
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: var(--tg-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; cursor: pointer; z-index: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .fab-menu { position: fixed; bottom: 90px; right: 25px; display: none; flex-direction: column; gap: 10px; z-index: 800; }
-        .fab-item { background: #fff; padding: 12px 20px; border-radius: 20px; font-weight: bold; color: var(--tg-blue); box-shadow: 0 2px 10px rgba(0,0,0,0.1); cursor: pointer; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--tg-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; cursor: pointer; z-index: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .fab-menu { position: fixed; bottom: 95px; right: 25px; display: none; flex-direction: column; gap: 10px; z-index: 800; }
+        .fab-item { background: #fff; padding: 14px 22px; border-radius: 25px; font-weight: bold; color: var(--tg-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; border: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div class="auth-screen" id="auth-screen">
     <div class="auth-card active" id="card-welcome">
-        <h2>Daugram Elite</h2>
+        <h1 style="color:var(--tg-blue)">Daugram Elite</h1>
+        <p>Келесі буын мессенджері</p>
         <button class="btn" onclick="showAuth('reg')">Начать работу</button>
-        <button class="btn" style="background:none; color:#fff" onclick="showAuth('login')">У меня есть аккаунт</button>
+        <button class="btn" style="background:none; color:#fff" onclick="showAuth('login')">Войти в аккаунт</button>
     </div>
     <div class="auth-card" id="card-reg">
         <h2>Регистрация</h2>
-        <input type="text" id="reg-name" placeholder="Ваше Имя">
-        <input type="text" id="reg-user" placeholder="Юзернейм">
+        <input type="text" id="reg-name" placeholder="Имя">
+        <input type="text" id="reg-user" placeholder="Юзернейм (@id)">
         <input type="email" id="reg-email" placeholder="Email">
         <input type="password" id="reg-pass" placeholder="Пароль">
         <button class="btn" onclick="handleRegister()">Создать аккаунт</button>
+        <p onclick="showAuth('welcome')" style="cursor:pointer; color:var(--tg-gray)">Назад</p>
     </div>
     <div class="auth-card" id="card-login">
         <h2>Вход</h2>
         <input type="email" id="login-email" placeholder="Email">
         <input type="password" id="login-pass" placeholder="Пароль">
         <button class="btn" onclick="handleLogin()">Войти</button>
+        <p onclick="showAuth('welcome')" style="cursor:pointer; color:var(--tg-gray)">Назад</p>
     </div>
 </div>
 
 <div class="app" id="app">
     <div class="header">
         <div onclick="toggleSidebar(true)" style="font-size:24px; cursor:pointer">☰</div>
-        <div class="search-box"><input type="text" id="search" placeholder="Поиск..." oninput="renderChats()"></div>
+        <div class="search-box"><input type="text" id="search" placeholder="Поиск людей или групп..." oninput="renderChats()"></div>
     </div>
     <div class="chat-list" id="chat-list"></div>
+    
     <div class="fab-menu" id="fab-menu">
         <div class="fab-item" onclick="showCreateRoom('group')">👥 Новая группа</div>
         <div class="fab-item" onclick="showCreateRoom('channel')">📢 Новый канал</div>
@@ -93,44 +100,44 @@ here<!DOCTYPE html>
 
 <div class="modal" id="modal-create">
     <div class="modal-content">
-        <h3 id="create-title">Создание</h3>
-        <input type="text" id="room-name" placeholder="Название">
-        <input type="text" id="room-user" placeholder="Юзернейм (@id)">
-        <p id="room-error" style="color:red; font-size:12px; display:none">Этот ID уже занят!</p>
-        <button class="btn" onclick="processCreateRoom()">Создать</button>
-        <button class="btn" style="background:#eee; color:#333" onclick="closeModal()">Отмена</button>
+        <h3 id="create-title" style="margin-top:0">Создание</h3>
+        <input type="text" id="room-name" placeholder="Название (н-р: VIP Чат)">
+        <input type="text" id="room-user" placeholder="Юзернейм (н-р: my_group)" oninput="checkIdAvailability(this.value)">
+        <p id="room-error" style="color:#f44336; font-size:12px; display:none; margin:5px 0">❌ Этот ID уже занят!</p>
+        <button class="btn" id="create-btn" onclick="processCreateRoom()">Создать сейчас</button>
+        <button class="btn" style="background:#f1f1f2; color:#333" onclick="closeModal()">Отмена</button>
     </div>
 </div>
 
 <div class="chat-view" id="chat-view">
     <div class="chat-header">
-        <div onclick="closeChat()" style="font-size:30px; cursor:pointer">‹</div>
-        <div id="h-av" class="avatar" style="width:40px; height:40px; margin:0 12px"></div>
+        <div onclick="closeChat()" style="font-size:32px; cursor:pointer; padding-right:10px">‹</div>
+        <div id="h-av" class="avatar" style="width:40px; height:40px; margin-right:12px" onclick="viewChatInfo()"></div>
         <div style="flex:1">
-            <div id="h-name" style="font-weight:bold">Support</div>
-            <div id="h-status" style="font-size:12px; color:var(--tg-blue)">online</div>
+            <div id="h-name" style="font-weight:bold; font-size:16px">Daugram</div>
+            <div id="h-status" style="font-size:12px; color:var(--tg-blue)">онлайн</div>
         </div>
     </div>
     <div class="message-container" id="msg-box"></div>
     <div class="input-area">
-        <label class="icon-btn">📎<input type="file" id="file-input" hidden onchange="sendFile(this)"></label>
-        <label class="icon-btn" onclick="startCamera()">📷</label>
+        <label class="icon-btn">📎<input type="file" id="file-input" hidden onchange="handleFileSelect(this)"></label>
+        <div class="icon-btn" onclick="openCamera()">📷</div>
         <input type="text" id="m-input" placeholder="Сообщение..." style="margin:0; flex:1">
         <div id="voice-btn" class="icon-btn" onmousedown="startVoice()" onmouseup="stopVoice()" ontouchstart="startVoice()" ontouchend="stopVoice()">🎤</div>
-        <div onclick="sendMessage()" style="color:var(--tg-blue); font-weight:bold; cursor:pointer">OK</div>
+        <div onclick="sendMessage()" style="color:var(--tg-blue); font-weight:bold; cursor:pointer; padding:5px">OK</div>
     </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar(false)"></div>
 <div class="sidebar" id="sidebar">
-    <div style="background:var(--tg-blue); color:#fff; padding:30px 20px;">
-        <div id="u-av" class="avatar" style="width:60px; height:60px; border:2px solid #fff"></div>
-        <div id="u-name" style="font-weight:bold; margin-top:10px">User</div>
-        <div id="u-user" style="opacity:0.8">@user</div>
+    <div style="background:var(--tg-blue); color:#fff; padding:35px 20px;">
+        <div id="u-av" class="avatar" style="width:65px; height:65px; border:3px solid rgba(255,255,255,0.3); font-size:24px"></div>
+        <div id="u-name" style="font-weight:bold; margin-top:15px; font-size:18px">User</div>
+        <div id="u-user" style="opacity:0.8; font-size:14px">@user</div>
     </div>
-    <div style="padding:10px">
-        <div class="chat-item" onclick="location.reload()">🔄 Обновить</div>
-        <div class="chat-item" onclick="logout()" style="color:red">🚪 Выход</div>
+    <div style="padding:15px">
+        <div class="chat-item" onclick="location.reload()" style="border-radius:12px">🔄 Обновить приложение</div>
+        <div class="chat-item" onclick="logout()" style="color:#f44336; border-radius:12px">🚪 Выйти из аккаунта</div>
     </div>
 </div>
 
@@ -141,7 +148,7 @@ here<!DOCTYPE html>
     let activeId = null;
     let mediaRecorder;
     let audioChunks = [];
-    let currentCreateType = '';
+    let createType = 'group';
 
     if(users.length > 0) initApp();
 
@@ -151,7 +158,6 @@ here<!DOCTYPE html>
         localStorage.setItem('dg_cur_idx', curIdx);
     }
 
-    // AUTH LOGIC
     function showAuth(c) {
         document.querySelectorAll('.auth-card').forEach(x => x.classList.remove('active'));
         document.getElementById('card-'+c).classList.add('active');
@@ -159,11 +165,11 @@ here<!DOCTYPE html>
 
     function handleRegister() {
         const name = document.getElementById('reg-name').value;
-        const user = document.getElementById('reg-user').value.toLowerCase().trim();
+        const user = document.getElementById('reg-user').value.toLowerCase().replace('@','').trim();
         const email = document.getElementById('reg-email').value;
         const pass = document.getElementById('reg-pass').value;
-        if(users.find(u => u.user === user)) return alert('Юзернейм занят!');
-        users.push({ name, user, email, pass, chats: [] });
+        if(!name || !user || users.find(u => u.user === user)) return alert('Деректер қате немесе юзернейм бос емес!');
+        users.push({ name, user, email, pass, chats: [], av: '' });
         curIdx = users.length - 1; saveData(); initApp();
     }
 
@@ -171,7 +177,7 @@ here<!DOCTYPE html>
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-pass').value;
         const idx = users.findIndex(u => u.email === email && u.pass === pass);
-        if(idx === -1) return alert('Ошибка!');
+        if(idx === -1) return alert('Қате деректер!');
         curIdx = idx; saveData(); initApp();
     }
 
@@ -181,90 +187,92 @@ here<!DOCTYPE html>
         const me = users[curIdx];
         document.getElementById('u-name').innerText = me.name;
         document.getElementById('u-user').innerText = '@'+me.user;
-        document.getElementById('u-av').innerText = me.name[0];
+        document.getElementById('u-av').innerText = me.name[0].toUpperCase();
         renderChats();
     }
 
-    // ROOMS LOGIC
-    function toggleFab() { 
-        const m = document.getElementById('fab-menu'); 
-        m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; 
-    }
-
+    // MODAL & ROOMS
+    function toggleFab() { const m = document.getElementById('fab-menu'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
+    
     function showCreateRoom(type) {
-        currentCreateType = type;
+        createType = type;
         document.getElementById('create-title').innerText = type === 'group' ? 'Новая группа' : 'Новый канал';
         document.getElementById('modal-create').style.display = 'flex';
         toggleFab();
     }
 
+    function checkIdAvailability(val) {
+        const id = val.toLowerCase().trim();
+        const exists = rooms.find(r => r.id === id) || users.find(u => u.user === id);
+        document.getElementById('room-error').style.display = (exists && id) ? 'block' : 'none';
+        document.getElementById('create-btn').disabled = !!exists;
+    }
+
     function processCreateRoom() {
-        const name = document.getElementById('room-name').value;
-        const user = document.getElementById('room-user').value.toLowerCase().trim();
-        const error = document.getElementById('room-error');
+        const name = document.getElementById('room-name').value.trim();
+        const id = document.getElementById('room-user').value.toLowerCase().trim();
+        if(!name || !id || document.getElementById('room-error').style.display === 'block') return;
 
-        if(rooms.find(r => r.id === user) || users.find(u => u.user === user)) {
-            error.style.display = 'block';
-            return;
-        }
-
-        const newRoom = { id: user, name, type: currentCreateType, owner: users[curIdx].user, members: [users[curIdx].user], msgs: [] };
+        const newRoom = { id, name, type: createType, owner: users[curIdx].user, members: [users[curIdx].user], msgs: [], admins: [] };
         rooms.push(newRoom);
-        saveData();
-        closeModal();
-        renderChats();
-        openChat(user);
+        saveData(); closeModal(); renderChats(); openChat(id);
     }
 
     function renderChats() {
         const box = document.getElementById('chat-list'); box.innerHTML = '';
         const me = users[curIdx];
-        const search = document.getElementById('search').value.toLowerCase();
+        const q = document.getElementById('search').value.toLowerCase();
 
-        // Поиск по глобальным юзерам и комнатам
-        const filteredRooms = rooms.filter(r => r.members.includes(me.user) || r.id.includes(search));
-        const otherUsers = users.filter(u => u.user.includes(search) && u.user !== me.user);
+        const myRooms = rooms.filter(r => r.members.includes(me.user) || r.id.includes(q));
+        const otherUsers = users.filter(u => u.user.includes(q) && u.user !== me.user);
 
-        [...filteredRooms, ...otherUsers].forEach(c => {
+        [...myRooms, ...otherUsers].forEach(c => {
             const isRoom = !!c.type;
             box.innerHTML += `
                 <div class="chat-item" onclick="openChat('${isRoom ? c.id : c.user}')">
-                    <div class="avatar">${(c.name || c.user)[0]}</div>
-                    <div style="margin-left:15px">
-                        <b>${c.name || c.user}</b><br>
-                        <small style="color:var(--tg-blue)">${isRoom ? c.type : '@'+c.user}</small>
+                    <div class="avatar">${(c.name || c.user)[0].toUpperCase()}</div>
+                    <div style="margin-left:15px; flex:1">
+                        <div style="display:flex; justify-content:space-between">
+                            <b>${c.name || c.user}</b>
+                        </div>
+                        <small style="color:var(--tg-blue)">${isRoom ? (c.type==='group'?'группа':'канал') : '@'+c.user}</small>
                     </div>
                 </div>`;
         });
     }
 
-    // MESSAGING LOGIC
+    // MESSAGING
     function openChat(id) {
         activeId = id;
         const chat = rooms.find(r => r.id === id) || users.find(u => u.user === id);
         document.getElementById('chat-view').style.display = 'flex';
         document.getElementById('h-name').innerText = chat.name || chat.user;
-        document.getElementById('h-av').innerText = (chat.name || chat.user)[0];
+        document.getElementById('h-av').innerText = (chat.name || chat.user)[0].toUpperCase();
         renderMessages();
     }
 
-    function sendMessage(content = null, type = 'text') {
-        const text = content || document.getElementById('m-input').value.trim();
-        if(!text) return;
-
+    function sendMessage(body = null, type = 'text') {
+        const val = body || document.getElementById('m-input').value.trim();
+        if(!val) return;
         const me = users[curIdx];
         const room = rooms.find(r => r.id === activeId);
-        const msg = { sender: me.user, name: me.name, type: type, body: text, time: new Date().toLocaleTimeString() };
+        const msg = { sender: me.user, name: me.name, type, body: val, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
 
         if(room) {
+            if(room.type === 'channel' && room.owner !== me.user) return alert('Тек админ жаза алады!');
             room.msgs.push(msg);
         } else {
-            // Личка упрощенно
             let myChat = me.chats.find(c => c.id === activeId);
             if(!myChat) { myChat = { id: activeId, msgs: [] }; me.chats.push(myChat); }
             myChat.msgs.push(msg);
+            // Counterpart chat
+            const other = users.find(u => u.user === activeId);
+            if(other) {
+                let otherChat = other.chats.find(c => c.id === me.user);
+                if(!otherChat) { otherChat = { id: me.user, msgs: [] }; other.chats.push(otherChat); }
+                otherChat.msgs.push(msg);
+            }
         }
-
         document.getElementById('m-input').value = '';
         saveData(); renderMessages();
     }
@@ -277,46 +285,47 @@ here<!DOCTYPE html>
 
         msgs.forEach(m => {
             const isMy = m.sender === me.user;
-            let content = m.body;
-            if(m.type === 'image') content = `<img src="${m.body}">`;
-            if(m.type === 'audio') content = `<audio controls src="${m.body}"></audio>`;
-            if(m.type === 'file') content = `📄 <a href="${m.body}" download>Файл (Скачать)</a>`;
+            let html = m.body;
+            if(m.type === 'image') html = `<img src="${m.body}" onclick="window.open(this.src)">`;
+            if(m.type === 'voice') html = `<audio controls style="width:200px"><source src="${m.body}" type="audio/ogg"></audio>`;
+            if(m.type === 'file') html = `<div style="padding:10px; background:rgba(0,0,0,0.05); border-radius:10px">📄 <a href="${m.body}" download="file">Скачать файл</a></div>`;
 
             box.innerHTML += `
                 <div class="msg ${isMy?'sent':'received'}">
-                    ${!isMy ? `<small style="color:var(--tg-blue)">${m.name}</small><br>` : ''}
-                    ${content}
+                    ${!isMy ? `<small style="color:var(--tg-blue); font-weight:bold">${m.name}</small><br>` : ''}
+                    ${html}
+                    <div style="font-size:10px; color:gray; text-align:right; margin-top:4px">${m.time}</div>
                 </div>`;
         });
         box.scrollTop = box.scrollHeight;
     }
 
-    // VOICE RECORDING
+    // MEDIA FUNCTIONS
     async function startVoice() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
         document.getElementById('voice-btn').classList.add('voice-rec');
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
             const blob = new Blob(audioChunks, { type: 'audio/ogg' });
             const reader = new FileReader();
-            reader.onload = e => sendMessage(e.target.result, 'audio');
+            reader.onload = e => sendMessage(e.target.result, 'voice');
             reader.readAsDataURL(blob);
-            audioChunks = [];
         };
         mediaRecorder.start();
     }
 
     function stopVoice() {
-        if(mediaRecorder) {
+        if(mediaRecorder && mediaRecorder.state !== 'inactive') {
             mediaRecorder.stop();
             document.getElementById('voice-btn').classList.remove('voice-rec');
         }
     }
 
-    // FILES & CAMERA
-    function sendFile(input) {
+    function handleFileSelect(input) {
         const file = input.files[0];
+        if(!file) return;
         const reader = new FileReader();
         reader.onload = e => {
             const type = file.type.startsWith('image') ? 'image' : 'file';
@@ -325,22 +334,20 @@ here<!DOCTYPE html>
         reader.readAsDataURL(file);
     }
 
-    async function startCamera() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const track = stream.getVideoTracks()[0];
-        const imageCapture = new ImageCapture(track);
-        const bitmap = await imageCapture.grabFrame();
-        const canvas = document.createElement('canvas');
-        canvas.width = bitmap.width; canvas.height = bitmap.height;
-        canvas.getContext('2d').drawImage(bitmap, 0, 0);
-        sendMessage(canvas.toDataURL('image/png'), 'image');
-        track.stop();
+    async function openCamera() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        input.onchange = e => handleFileSelect(e.target);
+        input.click();
     }
 
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    function closeModal() { document.getElementById('modal-create').style.display = 'none'; }
     function closeChat() { document.getElementById('chat-view').style.display = 'none'; }
     function toggleSidebar(s) { document.getElementById('sidebar').classList.toggle('active', s); document.getElementById('overlay').style.display = s?'block':'none'; }
     function logout() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
+
