@@ -3,78 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qazaq Voice AI - Stable</title>
+    <title>Durak Online Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: white; text-align: center; padding: 20px; }
-        .card { max-width: 450px; margin: auto; background: #1e1e1e; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
-        h2 { color: #0088cc; margin-bottom: 20px; }
-        textarea { width: 100%; height: 150px; border-radius: 15px; border: none; padding: 15px; box-sizing: border-box; background: #2d2d2d; color: white; font-size: 16px; margin-bottom: 15px; outline: none; border: 1px solid #444; }
-        button { width: 100%; background: linear-gradient(45deg, #0088cc, #00c6ff); color: white; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
-        button:active { transform: scale(0.95); }
-        .audio-player { display: none; background: #2d2d2d; padding: 20px; border-radius: 15px; animation: fadeIn 0.5s; }
-        audio { width: 100%; }
-        .download-btn { display: inline-block; margin-top: 15px; background: #28a745; color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; width: 85%; }
-        #status { margin-bottom: 10px; font-size: 14px; color: #aaa; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        :root {
+            --tg-theme-bg-color: #1a472a; /* Жасыл сукно түсі */
+            --vip-gold: #ffd700;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Profile Section */
+        .profile-card {
+            background: rgba(0,0,0,0.5);
+            width: 90%;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 2px solid transparent;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        #avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        /* VIP Frame */
+        .vip-status #avatar {
+            border: 3px solid var(--vip-gold);
+            box-shadow: 0 0 15px var(--vip-gold);
+        }
+
+        .vip-badge {
+            display: none;
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--vip-gold);
+            color: black;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .vip-status .vip-badge { display: block; }
+
+        /* Game Board */
+        .game-board {
+            width: 95%;
+            height: 300px;
+            margin-top: 20px;
+            border: 3px solid #0e2e1a;
+            border-radius: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #26633b 0%, #1a472a 100%);
+        }
+
+        .card {
+            width: 50px;
+            height: 75px;
+            background: white;
+            color: black;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            margin: 2px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 90%;
+        }
+
+        button {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-play { background: #4CAF50; color: white; }
+        .btn-vip { background: var(--vip-gold); color: black; }
+
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            width: 80%;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Qazaq Voice AI 🎙️</h2>
-    <div id="status">Мәтін жазыңыз (Тегін және Тұрақты)</div>
-    
-    <textarea id="textInput" placeholder="Сәлем, қалайсың?"></textarea>
-    
-    <button onclick="generateVoice()">Дауысқа айналдыру 🔊</button>
-
-    <div id="audioSection" class="audio-player">
-        <audio id="audioPlayer" controls></audio>
-        <a id="downloadLink" class="download-btn" href="#" download="voicover.mp3">MP3 Жүктеу 📥</a>
+    <div class="profile-card" id="profileBox">
+        <div class="avatar-container">
+            <img src="https://via.placeholder.com/70" id="avatar" alt="User">
+            <div class="vip-badge">VIP</div>
+        </div>
+        <div>
+            <h3 id="username">Ойыншы</h3>
+            <small id="statusText">Мәртебе: Тегін</small>
+        </div>
     </div>
-</div>
 
-<script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
+    <div class="game-board">
+        <div id="table">
+            <p>Ойын бастау үшін басыңыз...</p>
+        </div>
+    </div>
 
-    function generateVoice() {
-        const text = document.getElementById('textInput').value.trim();
-        const status = document.getElementById('status');
-        const audioSection = document.getElementById('audioSection');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const downloadLink = document.getElementById('downloadLink');
+    <div class="controls">
+        <button class="btn-play" onclick="startGame()">Ботпен ойнау</button>
+        <button class="btn-play" onclick="changeName()">Атты өзгерту</button>
+        <button class="btn-vip" onclick="getVip()">VIP алу (Тегін)</button>
+        <button class="btn-play" onclick="changeAvatar()">Аватар қою</button>
+    </div>
 
-        if (!text) {
-            alert("Мәтін жазыңыз!");
-            return;
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let user = {
+            name: tg.initDataUnsafe?.user?.first_name || "Ойыншы",
+            isVip: false,
+            avatar: "https://via.placeholder.com/70"
+        };
+
+        // Бастапқы деректерді жүктеу
+        document.getElementById('username').innerText = user.name;
+
+        function changeName() {
+            const newName = prompt("Жаңа есімді енгізіңіз:");
+            if (newName) {
+                user.name = newName;
+                document.getElementById('username').innerText = newName;
+            }
         }
 
-        status.innerText = "Дайындап жатырмын... ⏳";
-        audioSection.style.display = 'none';
+        function changeAvatar() {
+            const url = prompt("Аватар суретіне сілтеме (URL) енгізіңіз:");
+            if (url) {
+                user.avatar = url;
+                document.getElementById('avatar').src = url;
+            }
+        }
 
-        // Google Translate TTS API - ең сенімді жол
-        const apiUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=kk&client=tw-ob`;
+        function getVip() {
+            user.isVip = true;
+            document.getElementById('profileBox').classList.add('vip-status');
+            document.getElementById('statusText').innerText = "Мәртебе: VIP Ойыншы";
+            alert("Құттықтаймыз! Сізге бірінші рет кіргеніңіз үшін ТЕГІН VIP берілді.");
+        }
 
-        audioPlayer.src = apiUrl;
-        downloadLink.href = apiUrl;
-
-        // Аудио жүктелгенде
-        audioPlayer.onloadeddata = () => {
-            status.innerText = "Дайын! Төменде тыңдап, жүктеп алыңыз 👇";
-            audioSection.style.display = 'block';
-        };
-
-        // Қате болған жағдайда балама сілтеме (басқа сервер арқылы)
-        audioPlayer.onerror = () => {
-            const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=kk`;
-            audioPlayer.src = fallbackUrl;
-            downloadLink.href = fallbackUrl;
-            status.innerText = "Қайта көріңіз...";
-        };
-    }
-</script>
-
+        function startGame() {
+            const table = document.getElementById('table');
+            table.innerHTML = ""; // Тақтаны тазалау
+            
+            // Карталарды имитациялау
+            const cards = ['6♠', 'A♥', '10♦', 'K♣', '7♠'];
+            cards.forEach(c => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                cardDiv.innerText = c;
+                table.appendChild(cardDiv);
+            });
+            
+            tg.MainButton.setText("ОЙЫН ЖҮРІП ЖАТЫР").show();
+        }
+    </script>
 </body>
 </html>
