@@ -3,264 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaspi Game (Unofficial)</title>
+    <title>Kaspi Game - Full Edition</title>
     <style>
         :root {
             --kaspi-red: #f14635;
             --kaspi-blue: #0089d0;
             --bg-gray: #f2f2f5;
+            --text-dark: #333;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-gray);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #ccc;
             margin: 0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
         }
 
         #app {
             width: 100%;
-            max-width: 400px;
-            background: white;
+            max-width: 450px;
+            background: var(--bg-gray);
+            min-height: 100vh;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* Тіркелу формасы */
-        .auth-screen, .main-screen {
-            display: none;
-            padding: 20px;
-            flex-direction: column;
-        }
-
+        /* Screens */
+        .screen { display: none; flex-direction: column; height: 100vh; }
         .active { display: flex; }
 
-        .logo {
-            color: var(--kaspi-red);
-            font-size: 32px;
-            font-weight: bold;
-            text-align: center;
-            margin: 40px 0;
+        /* Auth */
+        .auth-container { background: white; padding: 40px 20px; height: 100%; text-align: center; }
+        .logo { color: var(--kaspi-red); font-size: 35px; font-weight: bold; margin-bottom: 30px; }
+
+        /* Inputs & Buttons */
+        input, select {
+            padding: 15px; margin: 8px 0; border: 1px solid #ddd;
+            border-radius: 10px; font-size: 16px; width: 85%; outline: none;
+        }
+        .btn-main {
+            background: var(--kaspi-blue); color: white; border: none;
+            padding: 15px; border-radius: 10px; font-weight: bold; width: 93%; cursor: pointer;
         }
 
-        input {
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
+        /* Header */
+        .header { background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        
+        /* Balance Card */
+        .card {
+            background: white; margin: 15px; padding: 20px; border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+        .balance-val { font-size: 30px; font-weight: bold; color: var(--text-dark); }
 
-        button {
-            background-color: var(--kaspi-blue);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        /* Menu */
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .menu-item { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 500; }
+        .icon { font-size: 24px; margin-bottom: 5px; display: block; }
 
-        /* Негізгі бет дизайны */
-        .header {
-            background: white;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Modals (Custom UI) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end;
         }
+        .modal-ui {
+            background: white; width: 100%; max-width: 450px; border-radius: 20px 20px 0 0;
+            padding: 25px; box-sizing: border-box; animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .balance-card {
-            background: white;
-            margin: 15px;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--kaspi-red);
-        }
-
-        .balance-amount {
-            font-size: 28px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 15px;
-        }
-
-        .menu-item {
-            text-align: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .icon-circle {
-            width: 50px;
-            height: 50px;
-            background: #f8f8f8;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 8px;
-            font-size: 24px;
-        }
-
-        /* Перевод терезесі */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 320px;
-        }
+        .error-msg { color: var(--kaspi-red); font-size: 13px; margin-top: 5px; display: none; }
+        .success-anim { color: #4caf50; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <div id="authScreen" class="auth-screen">
+    <div id="authScreen" class="screen auth-container">
         <div class="logo">Kaspi.kz</div>
-        <h3 id="authTitle">Тіркелу</h3>
-        <input type="text" id="phoneInput" placeholder="7 XXX XXX XXXX" maxlength="11">
-        <input type="password" id="passInput" placeholder="Құпия сөз (3-16 символ)">
-        <button onclick="handleAuth()">Кіру / Тіркелу</button>
-        <p style="color: grey; font-size: 12px; text-align: center; margin-top: 15px;">Тек ойын мақсатында</p>
+        <h2>Тіркелу</h2>
+        <input type="number" id="regPhone" placeholder="7XXXXXXXXXX">
+        <input type="password" id="regPass" placeholder="Құпия сөз (3-16)">
+        <button class="btn-main" onclick="register()">Аккаунт ашу</button>
     </div>
 
-    <div id="mainScreen" class="main-screen">
+    <div id="mainScreen" class="screen">
         <div class="header">
-            <span style="font-weight: bold; color: var(--kaspi-red);">Kaspi.kz</span>
-            <span id="userPhone" style="font-size: 14px; color: #666;"></span>
+            <b style="color: var(--kaspi-red)">Kaspi.kz</b>
+            <span id="displayPhone" style="font-size: 13px; color: #777;"></span>
         </div>
-
-        <div class="balance-card">
-            <div style="font-size: 14px; color: #666;">Kaspi Gold</div>
-            <div class="balance-amount"><span id="balance">500 000</span> ₸</div>
+        
+        <div class="card">
+            <div style="color: #888; font-size: 14px;">Kaspi Gold</div>
+            <div class="balance-val"><span id="balance">0</span> ₸</div>
         </div>
 
         <div class="menu-grid">
-            <div class="menu-item" onclick="openTransfer()">
-                <div class="icon-circle" style="color: var(--kaspi-blue);">⇄</div>
-                Перевод
+            <div class="menu-item" onclick="showModal('transferModal')">
+                <span class="icon" style="color: var(--kaspi-blue)">⇄</span> Перевод
             </div>
-            <div class="menu-item">
-                <div class="icon-circle" style="color: #4caf50;">📱</div>
-                Платежи
+            <div class="menu-item" onclick="showModal('creditModal')">
+                <span class="icon" style="color: #4caf50">💰</span> Кредит
             </div>
-            <div class="menu-item">
-                <div class="icon-circle" style="color: #ff9800;">🛒</div>
-                Магазин
+            <div class="menu-item" onclick="alert('Жақында...')">
+                <span class="icon" style="color: #ff9800">📦</span> Магазин
             </div>
         </div>
     </div>
 </div>
 
-<div id="transferModal" class="modal">
-    <div class="modal-content">
-        <h4>Ақша аудару</h4>
-        <input type="text" id="targetPhone" placeholder="Кімге (нөмір)">
-        <input type="number" id="amountInput" placeholder="Сомма">
-        <button onclick="processTransfer()" style="width: 100%;">Жіберу</button>
-        <button onclick="closeTransfer()" style="width: 100%; background: #ccc; margin-top: 5px;">Жабу</button>
+<div id="transferModal" class="modal-overlay">
+    <div class="modal-ui">
+        <h3>Аудару</h3>
+        <input type="number" id="toPhone" placeholder="Кімге (7XXXXXXXXXX)">
+        <input type="number" id="toAmount" placeholder="Сомма ₸">
+        <div id="transferError" class="error-msg">Нөмір қате немесе қаражат аз!</div>
+        <button class="btn-main" onclick="doTransfer()">Жіберу</button>
+        <button class="btn-main" style="background:#eee; color:#333; margin-top:10px" onclick="hideModal('transferModal')">Жабу</button>
+    </div>
+</div>
+
+<div id="creditModal" class="modal-overlay">
+    <div class="modal-ui">
+        <h3>Кредит алу</h3>
+        <input type="number" id="credAmount" placeholder="Сомма (1000 - 500000)" min="1000" max="500000">
+        <select id="credTerm">
+            <option value="1">1 сағат (5% комиссия)</option>
+            <option value="24">1 күн (10% комиссия)</option>
+            <option value="120">5 күн (20% комиссия)</option>
+        </select>
+        <div id="credInfo" style="font-size: 12px; margin: 10px 0; color: #666;"></div>
+        <button class="btn-main" style="background:var(--kaspi-red)" onclick="takeCredit()">Алу</button>
+        <button class="btn-main" style="background:#eee; color:#333; margin-top:10px" onclick="hideModal('creditModal')">Жабу</button>
     </div>
 </div>
 
 <script>
-    let currentUser = null;
+    let user = null;
+    const USERS_DB = 'kaspi_game_users'; // Барлық тіркелгендер тізімі
 
-    // Бастапқы тексеріс
-    window.onload = function() {
-        const savedUser = localStorage.getItem('kaspi_user');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            showMain();
+    window.onload = () => {
+        const saved = localStorage.getItem('current_session');
+        if (saved) {
+            user = JSON.parse(saved);
+            loadMain();
         } else {
             document.getElementById('authScreen').classList.add('active');
         }
     };
 
-    function handleAuth() {
-        const phone = document.getElementById('phoneInput').value;
-        const pass = document.getElementById('passInput').value;
+    function register() {
+        const ph = document.getElementById('regPhone').value;
+        const ps = document.getElementById('regPass').value;
 
-        // Валидация
-        if (!/^\d{11}$/.test(phone)) {
-            alert("Нөмірді 7XXXXXXXXXX форматында жазыңыз (11 сан)");
+        if (ph.length !== 11) return alert("Нөмір 11 сан болуы керек!");
+        if (ps.length < 3 || ps.length > 16) return alert("Пароль ұзындығы қате!");
+
+        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
+        
+        if (allUsers.find(u => u.phone === ph)) {
+            alert("Бұл нөмір тіркелген! Басқа нөмір жазыңыз.");
             return;
         }
-        if (pass.length < 3 || pass.length > 16) {
-            alert("Құпия сөз 3 пен 16 символ арасында болуы керек");
-            return;
-        }
 
-        // Сақтау
-        currentUser = {
-            phone: phone,
-            password: pass,
-            balance: 500000
-        };
-        localStorage.setItem('kaspi_user', JSON.stringify(currentUser));
-        showMain();
+        user = { phone: ph, pass: ps, balance: 50000 }; // Старттық 50к
+        allUsers.push(user);
+        localStorage.setItem(USERS_DB, JSON.stringify(allUsers));
+        localStorage.setItem('current_session', JSON.stringify(user));
+        loadMain();
     }
 
-    function showMain() {
-        document.getElementById('authScreen').classList.remove('active');
+    function loadMain() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('mainScreen').classList.add('active');
-        document.getElementById('userPhone').innerText = "+" + currentUser.phone;
-        updateBalanceDisplay();
+        document.getElementById('displayPhone').innerText = "+" + user.phone;
+        document.getElementById('balance').innerText = user.balance.toLocaleString();
     }
 
-    function updateBalanceDisplay() {
-        document.getElementById('balance').innerText = currentUser.balance.toLocaleString();
-    }
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function openTransfer() {
-        document.getElementById('transferModal').style.display = 'flex';
-    }
+    function doTransfer() {
+        const targetPh = document.getElementById('toPhone').value;
+        const amount = parseInt(document.getElementById('toAmount').value);
+        const err = document.getElementById('transferError');
+        
+        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
+        const targetExist = allUsers.find(u => u.phone === targetPh);
 
-    function closeTransfer() {
-        document.getElementById('transferModal').style.display = 'none';
-    }
-
-    function processTransfer() {
-        const amount = parseInt(document.getElementById('amountInput').value);
-        const target = document.getElementById('targetPhone').value;
-
-        if (!amount || amount <= 0) {
-            alert("Дұрыс сомма жазыңыз");
-            return;
-        }
-        if (amount > currentUser.balance) {
-            alert("Қаражат жеткіліксіз");
+        if (!targetExist || targetPh === user.phone || amount > user.balance || !amount) {
+            err.style.display = 'block';
+            err.innerText = "Қате: Нөмір табылмады немесе өз нөміріңіз!";
             return;
         }
 
-        currentUser.balance -= amount;
-        localStorage.setItem('kaspi_user', JSON.stringify(currentUser));
-        updateBalanceDisplay();
-        alert(target + " нөміріне " + amount + " ₸ сәтті аударылды!");
-        closeTransfer();
+        user.balance -= amount;
+        updateUserInDB();
+        err.style.display = 'none';
+        alert("Ақша сәтті жіберілді!");
+        hideModal('transferModal');
+        loadMain();
+    }
+
+    function takeCredit() {
+        const amt = parseInt(document.getElementById('credAmount').value);
+        if (amt < 1000 || amt > 500000 || !amt) {
+            alert("Сомма 1000 - 500 000 арасында болуы керек");
+            return;
+        }
+
+        user.balance += amt;
+        updateUserInDB();
+        alert("Кредит мақұлданды! Ақша балансқа түсті.");
+        hideModal('creditModal');
+        loadMain();
+    }
+
+    function updateUserInDB() {
+        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
+        const idx = allUsers.findIndex(u => u.phone === user.phone);
+        allUsers[idx] = user;
+        localStorage.setItem(USERS_DB, JSON.stringify(allUsers));
+        localStorage.setItem('current_session', JSON.stringify(user));
     }
 </script>
 
