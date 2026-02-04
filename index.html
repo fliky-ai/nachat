@@ -1,339 +1,269 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="kk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daugram Elite - Groups & Channels</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaspi Game (Unofficial)</title>
     <style>
-        /* Алдыңғы барлық стильдер сақталды */
-        :root { --tg-blue: #24a1de; --tg-bg: #ffffff; --tg-sent: #effdde; --tg-gray: #8e8e93; --blur: saturate(180%) blur(20px); }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: -apple-system, sans-serif; background: var(--tg-bg); overflow: hidden; }
-        .auth-screen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #24a1de, #0088cc); display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: var(--blur); width: 100%; max-width: 380px; padding: 40px; border-radius: 30px; text-align: center; display: none; }
-        .auth-card.active { display: block; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 15px; font-size: 16px; box-sizing: border-box; outline: none; background: #f5f5f5; }
-        .btn { width: 100%; padding: 16px; background: var(--tg-blue); color: #fff; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; margin-top: 15px; }
-        .app { display: none; height: 100vh; flex-direction: column; }
-        .header { height: 60px; padding: 0 16px; display: flex; align-items: center; border-bottom: 1px solid #eee; background: rgba(255,255,255,0.8); backdrop-filter: var(--blur); z-index: 100; }
-        .search-box { flex: 1; margin-left: 15px; background: #f1f1f2; border-radius: 12px; display: flex; align-items: center; padding: 0 12px; }
-        .search-box input { background: none; border: none; padding: 8px; margin: 0; width: 100%; }
-        .chat-list { flex: 1; overflow-y: auto; background: #fff; }
-        .chat-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 0.5px solid #f0f0f0; }
-        .avatar { width: 54px; height: 54px; border-radius: 50%; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 20px; flex-shrink: 0; position: relative; }
-        .chat-view { position: fixed; inset: 0; background: #e7ecef; z-index: 500; display: none; flex-direction: column; }
-        .chat-header { background: rgba(255,255,255,0.9); backdrop-filter: var(--blur); padding: 8px 16px; display: flex; align-items: center; border-bottom: 1px solid #ddd; }
-        .message-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 15px; font-size: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg.received { background: #fff; align-self: flex-start; }
-        .msg.sent { background: var(--tg-sent); align-self: flex-end; }
-        .input-area { background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-top: 1px solid #eee; }
-        .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; width: 280px; background: #fff; z-index: 1000; transition: 0.3s; box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
-        .sidebar.active { left: 0; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 900; display: none; }
-        .modal { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; padding: 25px; overflow-y: auto; }
-        .mention { color: var(--tg-blue); cursor: pointer; font-weight: 500; }
+        :root {
+            --kaspi-red: #f14635;
+            --kaspi-blue: #0089d0;
+            --bg-gray: #f2f2f5;
+        }
 
-        /* FAB STYLE */
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--tg-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 800; }
-        .fab-menu { position: fixed; bottom: 95px; right: 25px; display: none; flex-direction: column; gap: 10px; z-index: 800; }
-        .fab-btn { background: white; color: var(--tg-blue); border: 1px solid var(--tg-blue); padding: 12px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; box-shadow: var(--shadow); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-gray);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Тіркелу формасы */
+        .auth-screen, .main-screen {
+            display: none;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .active { display: flex; }
+
+        .logo {
+            color: var(--kaspi-red);
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        input {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--kaspi-blue);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Негізгі бет дизайны */
+        .header {
+            background: white;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-card {
+            background: white;
+            margin: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--kaspi-red);
+        }
+
+        .balance-amount {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .menu-item {
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .icon-circle {
+            width: 50px;
+            height: 50px;
+            background: #f8f8f8;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 8px;
+            font-size: 24px;
+        }
+
+        /* Перевод терезесі */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 320px;
+        }
     </style>
 </head>
 <body>
 
-<div class="auth-screen" id="auth-screen">
-    <div class="auth-card active" id="card-welcome">
-        <h2>Daugram Elite</h2>
-        <button class="btn" onclick="showAuth('reg')">Начать общение</button>
-        <button class="btn" style="background:none; color:var(--tg-blue)" onclick="showAuth('login')">Войти</button>
+<div id="app">
+    <div id="authScreen" class="auth-screen">
+        <div class="logo">Kaspi.kz</div>
+        <h3 id="authTitle">Тіркелу</h3>
+        <input type="text" id="phoneInput" placeholder="7 XXX XXX XXXX" maxlength="11">
+        <input type="password" id="passInput" placeholder="Құпия сөз (3-16 символ)">
+        <button onclick="handleAuth()">Кіру / Тіркелу</button>
+        <p style="color: grey; font-size: 12px; text-align: center; margin-top: 15px;">Тек ойын мақсатында</p>
     </div>
-    <div class="auth-card" id="card-reg">
-        <h2>Регистрация</h2>
-        <input type="text" id="reg-name" placeholder="Ваше Имя">
-        <input type="text" id="reg-user" placeholder="Юзернейм (без @)">
-        <input type="email" id="reg-email" placeholder="Email">
-        <input type="password" id="reg-pass" placeholder="Пароль">
-        <button class="btn" onclick="handleRegister()">Создать аккаунт</button>
-    </div>
-    <div class="auth-card" id="card-login">
-        <h2>Вход</h2>
-        <input type="email" id="login-email" placeholder="Email">
-        <input type="password" id="login-pass" placeholder="Пароль">
-        <button class="btn" onclick="handleLogin()">Войти</button>
-    </div>
-</div>
 
-<div class="app" id="app">
-    <div class="header">
-        <div onclick="toggleSidebar(true)" style="cursor:pointer">☰</div>
-        <div class="search-box"><input type="text" id="search" placeholder="Поиск..." oninput="doSearch()"></div>
-    </div>
-    <div class="chat-list" id="chat-list"></div>
-    <div class="fab-menu" id="fab-menu">
-        <div class="fab-btn" onclick="openCreateModal('group')">👥 Группа</div>
-        <div class="fab-btn" onclick="openCreateModal('channel')">📢 Канал</div>
-    </div>
-    <div class="fab" onclick="toggleFab()">+</div>
-</div>
+    <div id="mainScreen" class="main-screen">
+        <div class="header">
+            <span style="font-weight: bold; color: var(--kaspi-red);">Kaspi.kz</span>
+            <span id="userPhone" style="font-size: 14px; color: #666;"></span>
+        </div>
 
-<div class="overlay" id="overlay" onclick="toggleSidebar(false)"></div>
-<div class="sidebar" id="sidebar">
-    <div style="background:var(--tg-blue); color:white; padding:30px 20px;">
-        <div id="u-av" class="avatar"></div>
-        <div id="u-name" style="font-weight:bold; margin-top:10px"></div>
-        <div id="u-user" style="opacity:0.8"></div>
-    </div>
-    <div id="account-switcher"></div>
-    <div style="padding:10px">
-        <div class="chat-item" onclick="showAuth('welcome', true)">➕ Аккаунт</div>
-        <div class="chat-item" onclick="logout()">🚪 Выход</div>
-    </div>
-</div>
+        <div class="balance-card">
+            <div style="font-size: 14px; color: #666;">Kaspi Gold</div>
+            <div class="balance-amount"><span id="balance">500 000</span> ₸</div>
+        </div>
 
-<div class="chat-view" id="chat-view">
-    <div class="chat-header">
-        <span onclick="closeChat()" style="font-size:24px; cursor:pointer">‹</span>
-        <div id="h-av" class="avatar" style="width:40px; height:40px; margin:0 12px; cursor:pointer" onclick="viewChatInfo()"></div>
-        <div style="flex:1">
-            <div id="h-name" style="font-weight:bold"></div>
-            <div id="h-status" style="font-size:12px; color:var(--tg-blue)">онлайн</div>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openTransfer()">
+                <div class="icon-circle" style="color: var(--kaspi-blue);">⇄</div>
+                Перевод
+            </div>
+            <div class="menu-item">
+                <div class="icon-circle" style="color: #4caf50;">📱</div>
+                Платежи
+            </div>
+            <div class="menu-item">
+                <div class="icon-circle" style="color: #ff9800;">🛒</div>
+                Магазин
+            </div>
         </div>
     </div>
-    <div class="message-container" id="msg-box"></div>
-    <div class="input-area">
-        <input type="text" id="m-input" placeholder="Сообщение...">
-        <div onclick="sendMessage()" style="color:var(--tg-blue); font-weight:bold; cursor:pointer">ОТПРАВИТЬ</div>
-    </div>
 </div>
 
-<div class="modal" id="modal-info">
-    <div id="v-av" class="avatar" style="width:120px; height:120px; margin:20px auto"></div>
-    <h2 id="v-name" style="text-align:center"></h2>
-    <p id="v-user" style="text-align:center; color:var(--tg-blue)"></p>
-    <div id="v-extra" style="background:#f5f5f5; padding:15px; border-radius:15px; margin:15px 0"></div>
-    <div id="admin-tools"></div>
-    <button class="btn" onclick="closeModal()">Закрыть</button>
+<div id="transferModal" class="modal">
+    <div class="modal-content">
+        <h4>Ақша аудару</h4>
+        <input type="text" id="targetPhone" placeholder="Кімге (нөмір)">
+        <input type="number" id="amountInput" placeholder="Сомма">
+        <button onclick="processTransfer()" style="width: 100%;">Жіберу</button>
+        <button onclick="closeTransfer()" style="width: 100%; background: #ccc; margin-top: 5px;">Жабу</button>
+    </div>
 </div>
 
 <script>
-    let users = JSON.parse(localStorage.getItem('dg_users')) || [];
-    let rooms = JSON.parse(localStorage.getItem('dg_rooms')) || []; // Группы и каналы
-    let curIdx = parseInt(localStorage.getItem('dg_cur_idx')) || 0;
+    let currentUser = null;
 
-    if(users.length > 0) initApp();
-
-    function saveData() {
-        localStorage.setItem('dg_users', JSON.stringify(users));
-        localStorage.setItem('dg_rooms', JSON.stringify(rooms));
-        localStorage.setItem('dg_cur_idx', curIdx);
-    }
-
-    function showAuth(c, add=false) {
-        document.querySelectorAll('.auth-card').forEach(x => x.classList.remove('active'));
-        document.getElementById('card-'+c).classList.add('active');
-        document.getElementById('auth-screen').style.display = 'flex';
-        if(!add) document.getElementById('app').style.display = 'none';
-    }
-
-    function handleRegister() {
-        const name = document.getElementById('reg-name').value;
-        const user = document.getElementById('reg-user').value.toLowerCase().trim();
-        const email = document.getElementById('reg-email').value;
-        const pass = document.getElementById('reg-pass').value;
-        if(!name || !user) return alert('Заполните данные!');
-        const newUser = { name, user, email, pass, av: '', chats: [] };
-        users.push(newUser);
-        curIdx = users.length - 1;
-        saveData(); initApp();
-    }
-
-    function handleLogin() {
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-pass').value;
-        const idx = users.findIndex(u => u.email === email && u.pass === pass);
-        if(idx === -1) return alert('Ошибка!');
-        curIdx = idx; saveData(); initApp();
-    }
-
-    function initApp() {
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        updateSidebar(); renderChats();
-    }
-
-    function toggleFab() { const m = document.getElementById('fab-menu'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; }
-
-    function openCreateModal(type) {
-        const name = prompt('Введите название ' + (type === 'group' ? 'группы' : 'канала'));
-        const user = prompt('Введите юзернейм (ID)');
-        if(!name || !user) return;
-        const newRoom = { id: user, name, type, owner: users[curIdx].user, admins: [], members: [users[curIdx].user], msgs: [] };
-        rooms.push(newRoom);
-        saveData(); renderChats(); toggleFab();
-    }
-
-    function renderChats() {
-        const box = document.getElementById('chat-list'); box.innerHTML = '';
-        const me = users[curIdx];
-        
-        // Личные чаты + Группы/Каналы, в которых состоит юзер
-        const myRooms = rooms.filter(r => r.members.includes(me.user));
-        const all = [...me.chats, ...myRooms];
-
-        all.forEach(c => {
-            box.innerHTML += `
-                <div class="chat-item" onclick="openChat('${c.id}')">
-                    <div class="avatar" style="background-color:#24a1de">${c.name[0]}</div>
-                    <div style="margin-left:15px">
-                        <b>${c.name}</b><br>
-                        <small style="color:gray">${c.type ? (c.type==='group'?'Группа':'Канал') : '@'+c.id}</small>
-                    </div>
-                </div>`;
-        });
-    }
-
-    let activeId = null;
-    function openChat(id) {
-        activeId = id;
-        const me = users[curIdx];
-        const chat = rooms.find(r => r.id === id) || me.chats.find(c => c.id === id) || users.find(u => u.user === id);
-        
-        document.getElementById('chat-view').style.display = 'flex';
-        document.getElementById('h-name').innerText = chat.name || chat.user;
-        document.getElementById('h-av').innerText = (chat.name || chat.user)[0];
-        document.getElementById('h-status').innerText = chat.type ? (chat.type==='group'?'сообщество':'трансляция') : 'в сети';
-        renderMessages();
-    }
-
-    function sendMessage() {
-        const text = document.getElementById('m-input').value.trim();
-        if(!text) return;
-        const me = users[curIdx];
-        const room = rooms.find(r => r.id === activeId);
-
-        if(room) {
-            if(room.type === 'channel' && room.owner !== me.user && !room.admins.includes(me.user)) {
-                return alert('Только админы могут писать в канал!');
-            }
-            room.msgs.push({ t: text, sender: me.user, senderName: me.name, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+    // Бастапқы тексеріс
+    window.onload = function() {
+        const savedUser = localStorage.getItem('kaspi_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showMain();
         } else {
-            // Личка (Логика из предыдущего кода)
-            let myChat = me.chats.find(c => c.id === activeId);
-            if(!myChat) {
-                const other = users.find(u => u.user === activeId);
-                myChat = { id: other.user, name: other.name, msgs: [] };
-                me.chats.push(myChat);
-            }
-            myChat.msgs.push({ t: text, my: true, time: '12:00' });
+            document.getElementById('authScreen').classList.add('active');
+        }
+    };
+
+    function handleAuth() {
+        const phone = document.getElementById('phoneInput').value;
+        const pass = document.getElementById('passInput').value;
+
+        // Валидация
+        if (!/^\d{11}$/.test(phone)) {
+            alert("Нөмірді 7XXXXXXXXXX форматында жазыңыз (11 сан)");
+            return;
+        }
+        if (pass.length < 3 || pass.length > 16) {
+            alert("Құпия сөз 3 пен 16 символ арасында болуы керек");
+            return;
         }
 
-        document.getElementById('m-input').value = '';
-        saveData(); renderMessages();
+        // Сақтау
+        currentUser = {
+            phone: phone,
+            password: pass,
+            balance: 500000
+        };
+        localStorage.setItem('kaspi_user', JSON.stringify(currentUser));
+        showMain();
     }
 
-    function renderMessages() {
-        const box = document.getElementById('msg-box'); box.innerHTML = '';
-        const me = users[curIdx];
-        const room = rooms.find(r => r.id === activeId);
+    function showMain() {
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('mainScreen').classList.add('active');
+        document.getElementById('userPhone').innerText = "+" + currentUser.phone;
+        updateBalanceDisplay();
+    }
 
-        if(room) {
-            room.msgs.forEach(m => {
-                const isMy = m.sender === me.user;
-                box.innerHTML += `
-                    <div class="msg ${isMy?'sent':'received'}">
-                        ${room.type==='group' && !isMy ? `<small style="color:var(--tg-blue); font-weight:bold" onclick="openUserProfile('${m.sender}')">${m.senderName}</small><br>` : ''}
-                        ${m.t}
-                    </div>`;
-            });
+    function updateBalanceDisplay() {
+        document.getElementById('balance').innerText = currentUser.balance.toLocaleString();
+    }
+
+    function openTransfer() {
+        document.getElementById('transferModal').style.display = 'flex';
+    }
+
+    function closeTransfer() {
+        document.getElementById('transferModal').style.display = 'none';
+    }
+
+    function processTransfer() {
+        const amount = parseInt(document.getElementById('amountInput').value);
+        const target = document.getElementById('targetPhone').value;
+
+        if (!amount || amount <= 0) {
+            alert("Дұрыс сомма жазыңыз");
+            return;
         }
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function viewChatInfo() {
-        const room = rooms.find(r => r.id === activeId);
-        const modal = document.getElementById('modal-info');
-        const extra = document.getElementById('v-extra');
-        const adminTools = document.getElementById('admin-tools');
-        adminTools.innerHTML = '';
-
-        if(room) {
-            document.getElementById('v-name').innerText = room.name;
-            document.getElementById('v-user').innerText = 'd.me/' + room.id;
-            extra.innerHTML = `
-                <b>Владелец:</b> @${room.owner}<br>
-                <b>Тип:</b> ${room.type === 'group' ? 'Группа' : 'Канал'}<br>
-                <b>Участников:</b> ${room.members.length}`;
-            modal.style.display = 'block';
-        } else {
-            openUserProfile(activeId);
-        }
-    }
-
-    function openUserProfile(userId) {
-        const user = users.find(u => u.user === userId);
-        const room = rooms.find(r => r.id === activeId);
-        const me = users[curIdx];
-        
-        document.getElementById('v-name').innerText = user.name;
-        document.getElementById('v-user').innerText = '@' + user.user;
-        document.getElementById('v-extra').innerText = 'Информация о пользователе';
-        
-        const tools = document.getElementById('admin-tools');
-        tools.innerHTML = '';
-        
-        // Админ батырмасы (тек Группа иесіне көрінеді)
-        if(room && room.owner === me.user && user.user !== me.user) {
-            const isAdmin = room.admins.includes(user.user);
-            tools.innerHTML = `<button class="btn" style="background:orange" onclick="toggleAdmin('${user.user}')">
-                ${isAdmin ? 'Разжаловать' : 'Назначить админом'}
-            </button>`;
+        if (amount > currentUser.balance) {
+            alert("Қаражат жеткіліксіз");
+            return;
         }
 
-        document.getElementById('modal-info').style.display = 'block';
+        currentUser.balance -= amount;
+        localStorage.setItem('kaspi_user', JSON.stringify(currentUser));
+        updateBalanceDisplay();
+        alert(target + " нөміріне " + amount + " ₸ сәтті аударылды!");
+        closeTransfer();
     }
-
-    function toggleAdmin(userId) {
-        const room = rooms.find(r => r.id === activeId);
-        if(room.admins.includes(userId)) {
-            room.admins = room.admins.filter(a => a !== userId);
-        } else {
-            room.admins.push(userId);
-        }
-        saveData();
-        alert('Статус изменен!');
-        closeModal();
-    }
-
-    function handleLink(link) {
-        const target = link.replace('d.me/', '').replace('@', '');
-        const room = rooms.find(r => r.id === target);
-        if(room) {
-            if(!room.members.includes(users[curIdx].user)) {
-                if(confirm('Хотите вступить в ' + room.name + '?')) {
-                    room.members.push(users[curIdx].user);
-                    saveData();
-                } else return;
-            }
-            openChat(target);
-        }
-    }
-
-    function doSearch() {
-        const q = document.getElementById('search').value.toLowerCase();
-        if(q.includes('d.me/')) return handleLink(q);
-        renderChats();
-    }
-
-    function toggleSidebar(s) { document.getElementById('sidebar').classList.toggle('active', s); document.getElementById('overlay').style.display = s?'block':'none'; }
-    function closeChat() { document.getElementById('chat-view').style.display = 'none'; }
-    function closeModal() { document.getElementById('modal-info').style.display = 'none'; }
-    function updateSidebar() {
-        const me = users[curIdx];
-        document.getElementById('u-name').innerText = me.name;
-        document.getElementById('u-user').innerText = '@' + me.user;
-        document.getElementById('u-av').innerText = me.name[0];
-    }
-    function logout() { localStorage.clear(); location.reload(); }
 </script>
+
 </body>
 </html>
+
