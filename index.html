@@ -1,233 +1,199 @@
 <!DOCTYPE html>
-<html lang="kk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaspi Game - Full Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAM Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --kaspi-red: #f14635;
-            --kaspi-blue: #0089d0;
-            --bg-gray: #f2f2f5;
-            --text-dark: #333;
+            --bg-color: #0f0f0f;
+            --card-bg: #1c1c1e;
+            --accent-color: #0088cc;
+            --text-color: #ffffff;
+            --gram-gold: #ffcc00;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #ccc;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .header {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--gram-gold);
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        .clicker-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
             justify-content: center;
-        }
-
-        #app {
             width: 100%;
-            max-width: 450px;
-            background: var(--bg-gray);
-            min-height: 100vh;
+        }
+
+        .circle-btn {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #333, #111);
+            border-radius: 50%;
+            border: 8px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
+            cursor: pointer;
+            transition: transform 0.1s active;
+            box-shadow: 0 0 50px rgba(0, 136, 204, 0.2);
         }
 
-        /* Screens */
-        .screen { display: none; flex-direction: column; height: 100vh; }
-        .active { display: flex; }
-
-        /* Auth */
-        .auth-container { background: white; padding: 40px 20px; height: 100%; text-align: center; }
-        .logo { color: var(--kaspi-red); font-size: 35px; font-weight: bold; margin-bottom: 30px; }
-
-        /* Inputs & Buttons */
-        input, select {
-            padding: 15px; margin: 8px 0; border: 1px solid #ddd;
-            border-radius: 10px; font-size: 16px; width: 85%; outline: none;
-        }
-        .btn-main {
-            background: var(--kaspi-blue); color: white; border: none;
-            padding: 15px; border-radius: 10px; font-weight: bold; width: 93%; cursor: pointer;
+        .circle-btn:active {
+            transform: scale(0.95);
         }
 
-        /* Header */
-        .header { background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        
-        /* Balance Card */
-        .card {
-            background: white; margin: 15px; padding: 20px; border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        .circle-btn img {
+            width: 150px;
+            filter: drop-shadow(0 0 10px var(--gram-gold));
         }
-        .balance-val { font-size: 30px; font-weight: bold; color: var(--text-dark); }
 
-        /* Menu */
-        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .menu-item { background: white; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 500; }
-        .icon { font-size: 24px; margin-bottom: 5px; display: block; }
-
-        /* Modals (Custom UI) */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end;
+        .fps-counter {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            opacity: 0.4;
         }
-        .modal-ui {
-            background: white; width: 100%; max-width: 450px; border-radius: 20px 20px 0 0;
-            padding: 25px; box-sizing: border-box; animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .error-msg { color: var(--kaspi-red); font-size: 13px; margin-top: 5px; display: none; }
-        .success-anim { color: #4caf50; font-weight: bold; text-align: center; }
+        /* Анимация всплывающей цифры */
+        .floating-text {
+            position: absolute;
+            color: var(--gram-gold);
+            font-weight: bold;
+            font-size: 24px;
+            pointer-events: none;
+            animation: moveUp 0.8s ease-out forwards;
+        }
+
+        @keyframes moveUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div id="authScreen" class="screen auth-container">
-        <div class="logo">Kaspi.kz</div>
-        <h2>Тіркелу</h2>
-        <input type="number" id="regPhone" placeholder="7XXXXXXXXXX">
-        <input type="password" id="regPass" placeholder="Құпия сөз (3-16)">
-        <button class="btn-main" onclick="register()">Аккаунт ашу</button>
+    <div class="header">
+        <h2 id="username">Игрок</h2>
     </div>
 
-    <div id="mainScreen" class="screen">
-        <div class="header">
-            <b style="color: var(--kaspi-red)">Kaspi.kz</b>
-            <span id="displayPhone" style="font-size: 13px; color: #777;"></span>
+    <div class="stats-container">
+        <div class="stat-card">
+            <span class="stat-label">Баланс</span>
+            <span class="stat-value" id="balance">0</span>
         </div>
-        
-        <div class="card">
-            <div style="color: #888; font-size: 14px;">Kaspi Gold</div>
-            <div class="balance-val"><span id="balance">0</span> ₸</div>
-        </div>
-
-        <div class="menu-grid">
-            <div class="menu-item" onclick="showModal('transferModal')">
-                <span class="icon" style="color: var(--kaspi-blue)">⇄</span> Перевод
-            </div>
-            <div class="menu-item" onclick="showModal('creditModal')">
-                <span class="icon" style="color: #4caf50">💰</span> Кредит
-            </div>
-            <div class="menu-item" onclick="alert('Жақында...')">
-                <span class="icon" style="color: #ff9800">📦</span> Магазин
-            </div>
+        <div class="stat-card">
+            <span class="stat-label">Сила</span>
+            <span class="stat-value" id="power">0</span>
         </div>
     </div>
-</div>
 
-<div id="transferModal" class="modal-overlay">
-    <div class="modal-ui">
-        <h3>Аудару</h3>
-        <input type="number" id="toPhone" placeholder="Кімге (7XXXXXXXXXX)">
-        <input type="number" id="toAmount" placeholder="Сомма ₸">
-        <div id="transferError" class="error-msg">Нөмір қате немесе қаражат аз!</div>
-        <button class="btn-main" onclick="doTransfer()">Жіберу</button>
-        <button class="btn-main" style="background:#eee; color:#333; margin-top:10px" onclick="hideModal('transferModal')">Жабу</button>
+    <div class="clicker-area">
+        <div class="circle-btn" id="tapBtn">
+            <span style="font-size: 80px;">💎</span>
+        </div>
     </div>
-</div>
 
-<div id="creditModal" class="modal-overlay">
-    <div class="modal-ui">
-        <h3>Кредит алу</h3>
-        <input type="number" id="credAmount" placeholder="Сомма (1000 - 500000)" min="1000" max="500000">
-        <select id="credTerm">
-            <option value="1">1 сағат (5% комиссия)</option>
-            <option value="24">1 күн (10% комиссия)</option>
-            <option value="120">5 күн (20% комиссия)</option>
-        </select>
-        <div id="credInfo" style="font-size: 12px; margin: 10px 0; color: #666;"></div>
-        <button class="btn-main" style="background:var(--kaspi-red)" onclick="takeCredit()">Алу</button>
-        <button class="btn-main" style="background:#eee; color:#333; margin-top:10px" onclick="hideModal('creditModal')">Жабу</button>
-    </div>
-</div>
+    <div class="fps-counter">System FPS: <span id="fps">120</span> | v1.0</div>
 
-<script>
-    let user = null;
-    const USERS_DB = 'kaspi_game_users'; // Барлық тіркелгендер тізімі
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.headerColor = '#0f0f0f';
 
-    window.onload = () => {
-        const saved = localStorage.getItem('current_session');
-        if (saved) {
-            user = JSON.parse(saved);
-            loadMain();
-        } else {
-            document.getElementById('authScreen').classList.add('active');
-        }
-    };
+        let balance = 0;
+        let power = 0;
 
-    function register() {
-        const ph = document.getElementById('regPhone').value;
-        const ps = document.getElementById('regPass').value;
+        // Получаем данные из Telegram
+        document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
 
-        if (ph.length !== 11) return alert("Нөмір 11 сан болуы керек!");
-        if (ps.length < 3 || ps.length > 16) return alert("Пароль ұзындығы қате!");
+        const tapBtn = document.getElementById('tapBtn');
+        const balanceEl = document.getElementById('balance');
+        const powerEl = document.getElementById('power');
 
-        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
-        
-        if (allUsers.find(u => u.phone === ph)) {
-            alert("Бұл нөмір тіркелген! Басқа нөмір жазыңыз.");
-            return;
-        }
+        tapBtn.addEventListener('click', (e) => {
+            // Увеличиваем локально для скорости
+            power += 1;
+            balance += 10; // Допустим 10 грамм за клик
+            
+            powerEl.innerText = power.toLocaleString();
+            balanceEl.innerText = balance.toLocaleString();
 
-        user = { phone: ph, pass: ps, balance: 50000 }; // Старттық 50к
-        allUsers.push(user);
-        localStorage.setItem(USERS_DB, JSON.stringify(allUsers));
-        localStorage.setItem('current_session', JSON.stringify(user));
-        loadMain();
-    }
+            // Вибрация (Haptic Feedback)
+            tg.HapticFeedback.impactOccurred('medium');
 
-    function loadMain() {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('mainScreen').classList.add('active');
-        document.getElementById('displayPhone').innerText = "+" + user.phone;
-        document.getElementById('balance').innerText = user.balance.toLocaleString();
-    }
+            // Всплывающая цифра
+            createFloatingText(e.clientX, e.clientY);
 
-    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
+            // Отправляем данные в бот (если нужно закрыть приложение и передать результат)
+            // tg.sendData(JSON.stringify({action: "click", power: 1}));
+        });
 
-    function doTransfer() {
-        const targetPh = document.getElementById('toPhone').value;
-        const amount = parseInt(document.getElementById('toAmount').value);
-        const err = document.getElementById('transferError');
-        
-        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
-        const targetExist = allUsers.find(u => u.phone === targetPh);
-
-        if (!targetExist || targetPh === user.phone || amount > user.balance || !amount) {
-            err.style.display = 'block';
-            err.innerText = "Қате: Нөмір табылмады немесе өз нөміріңіз!";
-            return;
+        function createFloatingText(x, y) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = '+1';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            
+            setTimeout(() => el.remove(), 800);
         }
 
-        user.balance -= amount;
-        updateUserInDB();
-        err.style.display = 'none';
-        alert("Ақша сәтті жіберілді!");
-        hideModal('transferModal');
-        loadMain();
-    }
+        // Симуляция FPS для красоты (как ты просил)
+        setInterval(() => {
+            document.getElementById('fps').innerText = Math.floor(Math.random() * (120 - 110 + 1)) + 110;
+        }, 1000);
 
-    function takeCredit() {
-        const amt = parseInt(document.getElementById('credAmount').value);
-        if (amt < 1000 || amt > 500000 || !amt) {
-            alert("Сомма 1000 - 500 000 арасында болуы керек");
-            return;
-        }
-
-        user.balance += amt;
-        updateUserInDB();
-        alert("Кредит мақұлданды! Ақша балансқа түсті.");
-        hideModal('creditModal');
-        loadMain();
-    }
-
-    function updateUserInDB() {
-        let allUsers = JSON.parse(localStorage.getItem(USERS_DB) || "[]");
-        const idx = allUsers.findIndex(u => u.phone === user.phone);
-        allUsers[idx] = user;
-        localStorage.setItem(USERS_DB, JSON.stringify(allUsers));
-        localStorage.setItem('current_session', JSON.stringify(user));
-    }
-</script>
-
+    </script>
 </body>
 </html>
 
